@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.10)
+project(pkedit)
+
+# All sources
+set(SRCS
+  src/main.c
+  src/charset.c
+  src/items.c
+  src/savinfo.c
+  src/species.c
+)
+
+add_executable(pkedit ${SRCS})
+
+# Where to find headers like "foo.h"
+target_include_directories(pkedit PRIVATE src)
