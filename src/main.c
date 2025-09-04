@@ -7,6 +7,18 @@ int main(int argc, char *argv[])
 {
     char *filename = argv[1];
     FILE *fp = fopen(filename, "rb");
+    long filesize;
+
+    fseek(fp, 0, SEEK_END);
+    filesize = ftell(fp) / 1024;
+
+    if(filesize > 100)
+    {
+        printf("Save file is unusually large, quitting.\n");
+        return 1;
+    }
+
+    printf("%-15s [%ld KB]\n", "Save Filesize:", filesize);
 
     if(!fp)
     {

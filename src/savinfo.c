@@ -40,6 +40,7 @@ void show_sav_summary(char *filename, FILE *fp, int mode)
     get_play_time(fp);
     get_player_badges(fp);
     get_party_members(fp);
+    get_bag_items(fp);
    }
 }
 
@@ -47,7 +48,8 @@ void get_player_name(FILE *fp)
 {
     byte = 0;
     fseek(fp, PLAYER_OFFSET, SEEK_SET);
-    printf("Player Name: ");
+    printf("%-15s ", "Name:");
+    printf("[");
     while(true)
     {
         
@@ -62,7 +64,7 @@ void get_player_name(FILE *fp)
             printf(gb_charset[byte]);
         }
     }
-    printf("\n");
+    printf("]\n");
 }
 
 void get_player_money(FILE *fp)
@@ -79,7 +81,7 @@ void get_player_money(FILE *fp)
     int d5 = money[2] & 0xF;
     int total = d0*100000 + d1*10000 + d2*1000 + d3*100 + d4*10 + d5;
 
-    printf("Player Money: %i %s\n", total, POKE_YEN);
+    printf("%-15s [%i %s]\n", "Money:", total, POKE_YEN);
 }
 
 void get_player_id(FILE *fp)
@@ -91,14 +93,14 @@ void get_player_id(FILE *fp)
     //shift hi over 8 bytes then concat the low bytes.
     trainer_id = (id_hi << 8) | id_lo;
 
-    printf("Trainer ID: %04u\n", trainer_id);
+    printf("%-15s [%04u]\n", "Trainer ID:", trainer_id);
 }
 
 void get_hof_entries(FILE *fp)
 {
     fseek(fp, HALL_OF_FAME_OFFSET, SEEK_SET);
     fread(&byte, 1, 1, fp);
-    printf("Hall of Fame entries: %u\n", byte);
+    printf("%-15s [%u]\n", "HoF Entries:", byte);
 }
 
 void get_play_time(FILE *fp)
@@ -110,11 +112,15 @@ void get_play_time(FILE *fp)
 
     if(!max_hours)
     {
-        printf("Play time: %u hours and %u minutes\n", hours, minutes);
+        printf("%-15s [%u]\n", "PT Hours:", hours);
+        printf("%-15s [%u]\n", "PT Mins:", minutes);
+        //printf("Play time: %u hours and %u minutes\n", hours, minutes);
     }
     else
     {
-        printf("Play time: 255 hours and 59 minutes\n");
+        printf("%-15s [%u]\n", "PT Hours:", 255);
+        printf("%-15s [%u]\n", "PT Mins:", 59);
+        //printf("Play time: 255 hours and 59 minutes\n");
     }
 
     printf("\n");
@@ -122,12 +128,13 @@ void get_play_time(FILE *fp)
 
 void get_bag_items(FILE *fp)
 {
+    printf("Bag Items\n");
     byte = 0;
     fseek(fp, BAG_ITEMS_OFFSET, SEEK_SET);
     fread(&byte, 1, 1, fp);
-    printf("Bag Items (%u/20):\n", byte);
+    /* printf("Bag Items (%u/20):\n", byte);
     printf("%-15s %s\n", "Item", "Count");
-    printf("%-15s %s\n", "----", "-----");
+    printf("%-15s %s\n", "----", "-----"); */
 
     while(true)
     {
@@ -147,10 +154,8 @@ void get_bag_items(FILE *fp)
 
 void get_party_members(FILE *fp)
 {
+    printf("Party Pokemon\n");
     byte = 0;
-    printf("PARTY\n");
-    printf("-----\n");
-
     fseek(fp, PARTY_OFFSET, SEEK_SET);
     fread(&party_count, 1, 1, fp);
     uint8_t party_pkmn[party_count];
@@ -171,13 +176,16 @@ void get_party_members(FILE *fp)
 
     for(int i = 0; i < party_count; i++)
     {
-        printf("Slot %i - %s\n", i+1, species[party_pkmn[i]]);
+        char label[10];
+        snprintf(label, sizeof(label), "Slot %i", i + 1);
+        printf("%-15s [%s]\n", label, species[party_pkmn[i]]);
     }
     printf("\n");
 }
 
 void get_player_badges(FILE *fp)
 {
+    printf("Badges\n");
     fseek(fp, BADGE_OFFSET, SEEK_SET);
     fread(&byte, 1, 1, fp);
 
@@ -198,5 +206,5 @@ void get_player_badges(FILE *fp)
             printf("%-15s [%s]\n", badges[i], "NO");
         }
     }
-    printf("(%i/8)\n", badge_count);
+    printf("\n");
 }
