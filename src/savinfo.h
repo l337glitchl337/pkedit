@@ -10,5 +10,6 @@ void get_play_time(FILE *fp);
 void get_bag_items(FILE *fp);
 void get_party_members(FILE *fp);
 void get_player_badges(FILE *fp);
+void get_pokedex_summary(FILE *fp);
 
 #endif

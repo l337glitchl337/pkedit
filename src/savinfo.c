@@ -41,6 +41,7 @@ void show_sav_summary(char *filename, FILE *fp, int mode)
     get_player_badges(fp);
     get_party_members(fp);
     get_bag_items(fp);
+    get_pokedex_summary(fp);
    }
 }
 
@@ -150,6 +151,7 @@ void get_bag_items(FILE *fp)
             printf("%-15s [%u]\n", items[byte], count);
         }
     }
+    printf("\n");
 }
 
 void get_party_members(FILE *fp)
@@ -207,4 +209,46 @@ void get_player_badges(FILE *fp)
         }
     }
     printf("\n");
+}
+
+void get_pokedex_summary(FILE *fp)
+{
+    int owned = 0;
+    int seen = 0;
+    uint8_t seen_buffer[19];
+    uint8_t owned_buffer[19];
+
+    fseek(fp, POKEDEX_SEEN_OFFSET, SEEK_SET);
+    fread(&seen_buffer, sizeof(seen_buffer), 1, fp);
+    fseek(fp, POKEDEX_OWNED_OFFSET, SEEK_SET);
+    fread(&owned_buffer, sizeof(owned_buffer), 1, fp);
+    int len = sizeof(seen_buffer) / sizeof(seen_buffer[0]);
+
+    for(int i = 0; i < len; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            int s = (seen_buffer[i] >> j) & 1;
+            if(s)
+            {
+                seen++;
+            }
+        }
+    }
+
+    for(int i = 0; i < len; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            int s = (owned_buffer[i] >> j) & 1;
+            if(s)
+            {
+                owned++;
+            }
+        }
+    }
+
+    printf("PokeDex Progress\n");
+    printf("%-15s [%i]\n", "Seen:", seen);
+    printf("%-15s [%i]\n", "Owned", owned);
 }
