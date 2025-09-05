@@ -27,8 +27,9 @@ uint16_t calculate_checksum(FILE *fp)
     
     if(calculated_checksum == stored)
     {
-        printf("%-15s [%04X]\n", "Save checksum:", calculated_checksum);
+        //printf("%-15s [%04X]\n", "Save checksum:", calculated_checksum);
+        return calculated_checksum;
     }
 
-    return calculated_checksum;
+    return -1;
 }

@@ -9,7 +9,15 @@ int main(int argc, char *argv[])
     char *filename = argv[1];
     FILE *fp = fopen(filename, "rb");
 
-    calculate_checksum(fp);
+    uint16_t chk = calculate_checksum(fp);
+
+    if(chk < 0)
+    {
+        printf("Checksums do not match, quitting.\n");
+        return 1;
+    }
+
+    printf("%-15s [%04X]\n", "Save Checksum:", chk);
     long filesize;
 
     fseek(fp, 0, SEEK_END);
