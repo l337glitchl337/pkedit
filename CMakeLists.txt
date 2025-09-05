@@ -8,6 +8,7 @@ set(SRCS
   src/items.c
   src/savinfo.c
   src/species.c
+  src/editsav.c
 )
 
 add_executable(pkedit ${SRCS})

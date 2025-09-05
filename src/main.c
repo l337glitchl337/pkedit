@@ -2,23 +2,27 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "savinfo.h"
+#include "editsav.h"
 
 int main(int argc, char *argv[])
 {
     char *filename = argv[1];
     FILE *fp = fopen(filename, "rb");
+
+    calculate_checksum(fp);
     long filesize;
 
     fseek(fp, 0, SEEK_END);
     filesize = ftell(fp) / 1024;
 
-    if(filesize > 100)
+    if(filesize > 32)
     {
         printf("Save file is unusually large, quitting.\n");
         return 1;
     }
 
-    printf("%-15s [%ld KB]\n", "Save Filesize:", filesize);
+    printf("%-15s [%d KB]\n", "Save Filesize:", filesize);
+    printf("\n");
 
     if(!fp)
     {
