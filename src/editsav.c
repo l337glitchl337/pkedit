@@ -7,14 +7,16 @@
 
 uint16_t calculate_checksum(FILE *fp)
 {
+    // 2 byte buffer
     uint8_t checksum[2];
     fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
     fread(&checksum, sizeof(checksum), 1, fp);
     
-    //concat lo and hi bits
+    //concat lo and hi bits; this is our stored checksum
     uint16_t stored = checksum[0] | (checksum[1] << 8);
 
     uint16_t calculated_checksum = 0;
+    // 1 byte buffer with BUFF_ZIZE (3979 bytes)
     uint8_t buffer[BUFF_SIZE];
 
     int len = sizeof(buffer) / sizeof(buffer[0]);
