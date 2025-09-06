@@ -1,3 +1,6 @@
 *.sav
+*.srm
 main
 build/
+*.gb
+backups/

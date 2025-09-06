@@ -73,7 +73,7 @@ void get_player_money(FILE *fp)
     fseek(fp, MONEY_OFFSET, SEEK_SET);
     fread(&money, sizeof(money), 1, fp);
 
-    //get hi and low bytes (ones place, 10ths place)
+    //get hi and low bits (ones place, 10ths place)
     int d0 = (money[0] >> 4) & 0xF;
     int d1 = money[0] & 0xF;
     int d2 = (money[1] >> 4) & 0xF;
@@ -91,7 +91,7 @@ void get_player_id(FILE *fp)
     fseek(fp, PLAYER_ID_OFFSET, SEEK_SET);
     fread(&id_hi, 1, 1, fp);
     fread(&id_lo, 1, 1, fp);
-    //shift hi over 8 bytes then concat the low bytes.
+    //shift hi over 8 bits then concat the low bits.
     trainer_id = (id_hi << 8) | id_lo;
 
     printf("%-15s [%04u]\n", "Trainer ID:", trainer_id);

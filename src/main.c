@@ -7,9 +7,13 @@
 int main(int argc, char *argv[])
 {
     char *filename = argv[1];
-    FILE *fp = fopen(filename, "rb");
+    FILE *fp = fopen(filename, "r+b");
 
-    uint16_t chk = calculate_checksum(fp);
+    edit_money(fp, 999999);
+    fclose(fp);
+    return 0;
+
+    /* uint16_t chk = calculate_checksum(fp);
 
     if(chk < 0)
     {
@@ -38,5 +42,5 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    show_sav_summary(filename, fp, 1);
+    show_sav_summary(filename, fp, 1); */
 }
