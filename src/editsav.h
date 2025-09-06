@@ -3,5 +3,6 @@
 
 uint16_t calculate_checksum(FILE *fp);
 bool edit_money(FILE *fp, uint32_t amount);
+bool complete_pokedex(FILE *fp);
 
 #endif

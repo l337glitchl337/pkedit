@@ -76,6 +76,43 @@ bool edit_money(FILE *fp, uint32_t amount)
         fwrite(&chk, sizeof(chk), 1, fp);
         return true;
     }
+ 
+    return false;
+}
 
+bool complete_pokedex(FILE *fp)
+{
+    fseek(fp, POKEDEX_SEEN_OFFSET, SEEK_SET);
+    uint8_t buffer[19];
+    int len = sizeof(buffer) / sizeof(buffer[0]);
+
+    for(int i = 0; i < len; i++)
+    {
+        if (i == 18)
+        {
+            // values are in big endian so to get to get the correct PokeDex order the last byte needs to be 01111111
+            // hex 0x7F
+            buffer[i] = 0x7F;
+        }
+        else
+        {
+            buffer[i] = 0xFF;
+        }
+    }
+
+    fwrite(&buffer, sizeof(buffer), 1, fp);
+
+    fseek(fp, POKEDEX_OWNED_OFFSET, SEEK_SET);
+    fwrite(&buffer, sizeof(buffer), 1, fp);
+
+    uint16_t chk = calculate_checksum(fp);
+
+    if(chk > 0)
+    {
+        printf("checksum %04X\n", chk);
+        fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
+        fwrite(&chk, sizeof(chk), 1, fp);
+        return true;
+    }
     return false;
 }

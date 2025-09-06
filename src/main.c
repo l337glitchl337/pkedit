@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
     char *filename = argv[1];
     FILE *fp = fopen(filename, "r+b");
 
-    edit_money(fp, 999999);
+    complete_pokedex(fp);
+    //edit_money(fp, 999999);
     fclose(fp);
     return 0;
 
