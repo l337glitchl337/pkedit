@@ -99,8 +99,6 @@ bool complete_pokedex(FILE *fp)
     {
         if (i == len - 1)
         {
-            // values are in big endian so to get to get the correct PokeDex order the last byte needs to be 01111111
-            // hex 0x7F
             buffer[i] = 0x7F;
         }
         else
@@ -126,8 +124,8 @@ bool max_item(FILE *fp, uint8_t item)
     uint8_t cur_item = 0;
     uint8_t cur_item_count = 0;
     uint8_t max = 0x63;
-    long pos = 0;
     uint8_t term = 0xFF;
+    long pos = 0;
 
     fseek(fp, BAG_ITEMS_OFFSET, SEEK_SET);
     fread(&item_count, 1, 1, fp);
