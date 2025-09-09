@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "savinfo.h"
 #include "editsav.h"
 
 int main(int argc, char *argv[])
 {
     char *filename = argv[1];
+    unsigned long val = strtoul(argv[2], NULL, 0);
+    uint8_t item_selection = (uint8_t)val;
+    
     FILE *fp = fopen(filename, "r+b");
-
-    complete_pokedex(fp);
+    max_item(fp, item_selection);
+    
+    //complete_pokedex(fp);
     //edit_money(fp, 999999);
     fclose(fp);
     return 0;

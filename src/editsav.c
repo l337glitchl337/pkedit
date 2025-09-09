@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "editsav.h"
 #include "offsets.h"
+#include "items.h"
 
 #define BUFF_SIZE 3979
 
@@ -45,6 +46,20 @@ uint16_t calculate_checksum(FILE *fp)
     return -1; */
 }
 
+bool write_checksum(FILE* fp, uint16_t checksum)
+{
+    if(checksum > 0)
+    {
+        fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
+        fwrite(&checksum, sizeof(checksum), 1, fp);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 bool edit_money(FILE *fp, uint32_t amount)
 {
     uint8_t bcd_bytes[3];
@@ -69,13 +84,7 @@ bool edit_money(FILE *fp, uint32_t amount)
     fwrite(&bcd_bytes, 3, 1, fp);
 
     uint16_t chk = calculate_checksum(fp);
-    printf("checksum: %04X\n", chk);
-    if(chk > 0)
-    {
-        fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
-        fwrite(&chk, sizeof(chk), 1, fp);
-        return true;
-    }
+    write_checksum(fp, chk);
  
     return false;
 }
@@ -88,7 +97,7 @@ bool complete_pokedex(FILE *fp)
 
     for(int i = 0; i < len; i++)
     {
-        if (i == 18)
+        if (i == len - 1)
         {
             // values are in big endian so to get to get the correct PokeDex order the last byte needs to be 01111111
             // hex 0x7F
@@ -106,13 +115,56 @@ bool complete_pokedex(FILE *fp)
     fwrite(&buffer, sizeof(buffer), 1, fp);
 
     uint16_t chk = calculate_checksum(fp);
-
-    if(chk > 0)
-    {
-        printf("checksum %04X\n", chk);
-        fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
-        fwrite(&chk, sizeof(chk), 1, fp);
-        return true;
-    }
+    write_checksum(fp, chk);
     return false;
+}
+
+bool max_item(FILE *fp, uint8_t item)
+{
+    uint8_t byte = 0;
+    uint8_t item_count = 0;
+    uint8_t cur_item = 0;
+    uint8_t cur_item_count = 0;
+    uint8_t max = 0x63;
+    long pos = 0;
+    uint8_t term = 0xFF;
+
+    fseek(fp, BAG_ITEMS_OFFSET, SEEK_SET);
+    fread(&item_count, 1, 1, fp);
+
+    for(int i = 0; i < item_count; i++)
+    {
+        fread(&cur_item, 1, 1, fp);
+        fread(&cur_item_count, 1, 1, fp);
+
+        if(cur_item == item)
+        {
+            printf("Item [%s] found in bag slot [%i], setting to 99.\n", items[item], i+1);
+            pos = ftell(fp) - 1;
+            fseek(fp, pos, SEEK_SET);
+            fwrite(&max, 1, 1, fp);
+
+            uint16_t chk = calculate_checksum(fp);
+            write_checksum(fp, chk);
+            return true;
+        }
+    }
+
+    if(item_count < 20)
+    {
+        printf("Adding item [%s] to bag slot [%i]\n", items[item], item_count+1);
+        fwrite(&item, 1, 1, fp);
+        fwrite(&max, 1, 1, fp);
+        fwrite(&term, 1, 1, fp);
+        fseek(fp, BAG_ITEMS_OFFSET, SEEK_SET);
+        item_count++;
+        fwrite(&item_count, 1, 1, fp);
+        uint16_t chk = calculate_checksum(fp);
+        write_checksum(fp, chk);
+    }
+    else
+    {
+        printf("Error: Your bag is full, cannnot append another item.\n");
+        return false;
+    }
 }
