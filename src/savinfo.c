@@ -183,6 +183,57 @@ void get_party_members(FILE *fp)
         printf("%-15s [%s]\n", label, species[party_pkmn[i]]);
     }
     printf("\n");
+
+    uint8_t buffer = 0;
+    uint8_t hp_bytes[2];
+    uint8_t cur_pkmn;
+    const char *status_cond[0x41] = {
+        [0x04] = "Asleep",
+        [0x08] = "Poisoned",
+        [0x10] = "Burned",
+        [0x20] = "Frozen",
+        [0x40] = "Paralyzed",
+        [0x00] = "None"
+    
+    };
+
+    const char *types[0x1B] = {
+        [0x00] = "Normal",
+        [0x01] = "Fighting",
+        [0x02] = "Flying",
+        [0x03] = "Poison",
+        [0x04] = "Ground",
+        [0x05] = "Rock",
+        [0x06] = "Bird", // not used
+        [0x07] = "Bug",
+        [0x08] = "Ghost",
+        [0x14] = "Fire",
+        [0x15] = "Water",
+        [0x16] = "Grass",
+        [0x17] = "Electric",
+        [0x18] = "Psychic",
+        [0x19] = "Ice",
+        [0x1A] = "Dragon"
+    };
+
+    long pos = PARTY_OFFSET + 8;
+    fseek(fp, pos, SEEK_SET);
+    fread(&cur_pkmn, 1, 1, fp);
+    fread(&hp_bytes, 1, 2, fp);
+
+    uint16_t cur_hp = (hp_bytes[0] << 8) | hp_bytes[1];
+    printf("%-15s\n", species[cur_pkmn]);
+    printf("%-15s [%u]\n", "Current HP:", cur_hp);
+
+    pos = ftell(fp) + 1;
+    fseek(fp, pos, SEEK_SET);
+    fread(&buffer, 1, 1, fp);
+    printf("%-15s [%s]\n", "Status Cond.:", status_cond[buffer]);
+
+    fread(&buffer, 1, 1, fp);
+    printf("%-15s [%s]\n", "Type 1:", types[buffer]);
+    fread(&buffer, 1, 1, fp);
+    printf("%-15s [%s]\n", "Type 2:", types[buffer]);
 }
 
 void get_player_badges(FILE *fp)
