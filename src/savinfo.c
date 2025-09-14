@@ -324,8 +324,7 @@ void get_party_members(FILE *fp)
         //last IV is a bit of a pain in the arse to calculate
         //per the documentation, we need to take the LSB of each
         //IV calculated above, and then assemple it into a "binary string"
-        //what im doing here is getting the LSB from each IV, then shifting them all over to pack them into 8 bits, then 
-        //getting the last 4 bits of the total value by masking by 0xFF the masking part prob not necceary but should be fine
+        //what im doing here is getting the LSB from each IV, then shifting them all over to pack them into 8 bits
         uint8_t hp_iv = (attack_iv & 0x01) << 0 | (defense_iv & 0x01) << 1 | (speed_iv & 0x01) << 2 | (special_iv & 0x01) << 3;
 
         printf("Stats\n");
