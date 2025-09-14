@@ -363,39 +363,8 @@ void get_party_members(FILE *fp)
         printf("Misc.\n");
         printf("└──▶ %-15s [%s]\n", "Status Con:", status_cond[party[i]->status_cond]);
         printf("└──▶ %-15s [%02X]\n", "Held Item:", party[i]->catch_rate_held_item);
-        printf("└──▶ %-15s [%u]\n\n", "OT ID:", ot_id);
-
-        
-        
-
-
-
-        printf("\n");
+        printf("└──▶ %-15s [%u]\n", "OT ID:", ot_id);
     }
-
-/* 
-    uint8_t buffer = 0;
-    uint8_t hp_bytes[2];
-    uint8_t cur_pkmn;
-
-    long pos = PARTY_OFFSET + 8;
-    fseek(fp, pos, SEEK_SET);
-    fread(&cur_pkmn, 1, 1, fp);
-    fread(&hp_bytes, 1, 2, fp);
-
-    uint16_t cur_hp = (hp_bytes[0] << 8) | hp_bytes[1];
-    printf("%-15s\n", species[cur_pkmn]);
-    printf("%-15s [%u]\n", "Current HP:", cur_hp);
-
-    pos = ftell(fp) + 1;
-    fseek(fp, pos, SEEK_SET);
-    fread(&buffer, 1, 1, fp);
-    printf("%-15s [%s]\n", "Status Cond.:", status_cond[buffer]);
-
-    fread(&buffer, 1, 1, fp);
-    printf("%-15s [%s]\n", "Type 1:", types[buffer]);
-    fread(&buffer, 1, 1, fp);
-    printf("%-15s [%s]\n", "Type 2:", types[buffer]); */
 }
 
 void get_player_badges(FILE *fp)
