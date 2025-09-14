@@ -105,7 +105,6 @@ void get_player_money(FILE *fp)
     fseek(fp, MONEY_OFFSET, SEEK_SET);
     fread(&money, sizeof(money), 1, fp);
 
-    //get hi and low bits (ones place, 10ths place)
     int d0 = (money[0] >> 4) & 0xF;
     int d1 = money[0] & 0xF;
     int d2 = (money[1] >> 4) & 0xF;
@@ -147,13 +146,11 @@ void get_play_time(FILE *fp)
     {
         printf("%-15s [%u]\n", "PT Hours:", hours);
         printf("%-15s [%u]\n", "PT Mins:", minutes);
-        //printf("Play time: %u hours and %u minutes\n", hours, minutes);
     }
     else
     {
         printf("%-15s [%u]\n", "PT Hours:", 255);
         printf("%-15s [%u]\n", "PT Mins:", 59);
-        //printf("Play time: 255 hours and 59 minutes\n");
     }
 
     printf("\n");
@@ -165,9 +162,6 @@ void get_bag_items(FILE *fp)
     byte = 0;
     fseek(fp, BAG_ITEMS_OFFSET, SEEK_SET);
     fread(&byte, 1, 1, fp);
-    /* printf("Bag Items (%u/20):\n", byte);
-    printf("%-15s %s\n", "Item", "Count");
-    printf("%-15s %s\n", "----", "-----"); */
 
     while(true)
     {
