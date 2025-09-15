@@ -17,6 +17,8 @@ int main(int argc, char *argv[])
         return 1;
     }
     get_party_members(fp);
+
+    //get_bag_items(fp);
     fclose(fp);
     return 0;
 

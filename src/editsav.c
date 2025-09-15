@@ -4,6 +4,8 @@
 #include "editsav.h"
 #include "offsets.h"
 #include "items.h"
+#include "helpers.h"
+#include "pkmnstructs.h"
 
 #define BUFF_SIZE 3979
 
@@ -165,4 +167,15 @@ bool max_item(FILE *fp, uint8_t item)
         printf("Error: Your bag is full, cannnot append another item.\n");
         return false;
     }
+}
+
+bool edit_pokemon(FILE *fp, bool in_party, uint8_t party_count, int slot)
+{
+    if(in_party)
+    {
+        pokemon *party = load_party_pokemon(fp, party_count);
+        //todo
+        return true;
+    }
+    return false;
 }
