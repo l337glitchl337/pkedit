@@ -9,6 +9,7 @@ typedef struct pokemon
     bool in_party;
     int slot_position;
     long offset;
+    const char *name;
     uint8_t species;
     uint8_t current_hp[2];
     uint8_t status_cond;

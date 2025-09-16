@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "editsav.h"
 #include "offsets.h"
 #include "items.h"
@@ -9,16 +10,9 @@
 
 #define BUFF_SIZE 3979
 
-uint16_t calculate_checksum(FILE *fp)
+void calculate_checksum(FILE *fp)
 {
-    // 2 byte buffer
-/*     uint8_t checksum[2];
-    fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
-    fread(&checksum, sizeof(checksum), 1, fp); */
     
-    //concat lo and hi bits; this is our stored checksum
-    //uint16_t stored = checksum[0] | (checksum[1] << 8);
-
     uint16_t calculated_checksum = 0;
     // 1 byte buffer with BUFF_ZIZE (3979 bytes)
     uint8_t buffer[BUFF_SIZE];
@@ -37,23 +31,20 @@ uint16_t calculate_checksum(FILE *fp)
 
     //invert and get last 8 bits
     calculated_checksum = (~calculated_checksum) & 0xFF;
-    return calculated_checksum;
-    
-   /*  if(calculated_checksum == stored)
+    if(!write_checksum(fp, calculated_checksum))
     {
-        //printf("%-15s [%04X]\n", "Save checksum:", calculated_checksum);
-        return calculated_checksum;
+        printf("Error: Could not write checksum, quitting.");
+        exit(1);
     }
-
-    return -1; */
 }
 
 bool write_checksum(FILE* fp, uint16_t checksum)
 {
-    if(checksum > 0)
+    int seek = fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
+    int write = fwrite(&checksum, sizeof(checksum), 1, fp);
+
+    if(seek == 0 && write != 0)
     {
-        fseek(fp, CHECKSUM_OFFSET, SEEK_SET);
-        fwrite(&checksum, sizeof(checksum), 1, fp);
         return true;
     }
     else
@@ -84,11 +75,8 @@ bool edit_money(FILE *fp, uint32_t amount)
     bcd_bytes[2] = (d1 << 4) | d0;
 
     fwrite(&bcd_bytes, 3, 1, fp);
-
-    uint16_t chk = calculate_checksum(fp);
-    write_checksum(fp, chk);
- 
-    return false;
+    calculate_checksum(fp);
+    return true;
 }
 
 bool complete_pokedex(FILE *fp)
@@ -114,9 +102,8 @@ bool complete_pokedex(FILE *fp)
     fseek(fp, POKEDEX_OWNED_OFFSET, SEEK_SET);
     fwrite(&buffer, sizeof(buffer), 1, fp);
 
-    uint16_t chk = calculate_checksum(fp);
-    write_checksum(fp, chk);
-    return false;
+    calculate_checksum(fp);
+    return true;
 }
 
 bool max_item(FILE *fp, uint8_t item)
@@ -144,8 +131,7 @@ bool max_item(FILE *fp, uint8_t item)
             fseek(fp, pos, SEEK_SET);
             fwrite(&max, 1, 1, fp);
 
-            uint16_t chk = calculate_checksum(fp);
-            write_checksum(fp, chk);
+            calculate_checksum(fp);
             return true;
         }
     }
@@ -159,23 +145,12 @@ bool max_item(FILE *fp, uint8_t item)
         fseek(fp, BAG_ITEMS_OFFSET, SEEK_SET);
         item_count++;
         fwrite(&item_count, 1, 1, fp);
-        uint16_t chk = calculate_checksum(fp);
-        write_checksum(fp, chk);
+        calculate_checksum(fp);
+        return true;
     }
     else
     {
         printf("Error: Your bag is full, cannnot append another item.\n");
         return false;
     }
-}
-
-bool edit_pokemon(FILE *fp, bool in_party, uint8_t party_count, int slot)
-{
-    if(in_party)
-    {
-        pokemon *party = load_party_pokemon(fp, party_count);
-        //todo
-        return true;
-    }
-    return false;
 }

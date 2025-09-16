@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "savinfo.h"
 #include "editsav.h"
+#include "helpers.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +17,10 @@ int main(int argc, char *argv[])
         printf("Error opening file '%s', quitting.\n", filename);
         return 1;
     }
+
+    
+    //load_pokemon(fp, true, 4);
+
     get_party_members(fp);
 
     //get_bag_items(fp);

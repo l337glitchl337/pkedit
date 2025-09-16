@@ -176,10 +176,10 @@ void get_party_members(FILE *fp)
         uint16_t special = (party[i].special[0] << 8) | party[i].special[1];
 
         //calculating IV's byt doing some bit shifting and masking
-        uint16_t attack_iv = iv_data & 0xF;
-        uint16_t defense_iv = (iv_data >> 4) & 0xF;
-        uint16_t speed_iv = (iv_data >> 8) & 0xF;
-        uint16_t special_iv = (iv_data >> 12) & 0xF;
+        uint16_t special_iv = iv_data & 0xF;
+        uint16_t speed_iv = (iv_data >> 4) & 0xF;
+        uint16_t defense_iv = (iv_data >> 8) & 0xF;
+        uint16_t attack_iv = (iv_data >> 12) & 0xF;
 
         //last IV is a bit of a pain in the arse to calculate
         //per the documentation, we need to take the LSB of each
