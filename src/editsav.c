@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 #include "editsav.h"
 #include "offsets.h"
 #include "items.h"
@@ -153,4 +154,250 @@ bool max_item(FILE *fp, uint8_t item)
         printf("Error: Your bag is full, cannnot append another item.\n");
         return false;
     }
+}
+
+bool edit_attack_xp(FILE *fp, bool party, int slot, int xp)
+{
+    if(xp > 0xFFFF)
+    {
+        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
+        return false;
+    }
+
+    uint16_t val = xp;
+    uint8_t lo = val & 0xFF;
+    uint8_t hi = (val >> 8) & 0xFF;
+
+    pokemon *p = load_pokemon(fp, party, slot);
+    const PokemonBaseStats *base = get_base_stats(p->name);
+    if(!base)
+    {
+        printf("Pokemon not found, quitting.\n");
+        return false;
+    }
+
+    uint16_t new_attack = (uint16_t)floor(((2 * base->attack + p->attack_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+    uint8_t packed[2];
+    packed[0] = (new_attack >> 8) & 0xFF;
+    packed[1] = new_attack & 0xFF;
+
+    fseek(fp, p->offset_atk, SEEK_SET);
+    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
+    
+    p->atk_stat_exp[0] = hi;
+    p->atk_stat_exp[1] = lo;
+    fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
+    int write2 = fwrite(&p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
+
+    free(p);
+    if(write1 && write2)
+    {
+        calculate_checksum(fp);
+        return true;
+    }
+    return false;
+}
+
+bool edit_def_xp(FILE *fp, bool party, int slot, int xp)
+{
+   if(xp > 0xFFFF)
+    {
+        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
+        return false;
+    }
+
+    uint16_t val = xp;
+    uint8_t lo = val & 0xFF;
+    uint8_t hi = (val >> 8) & 0xFF;
+
+    pokemon *p = load_pokemon(fp, party, slot);
+    const PokemonBaseStats *base = get_base_stats(p->name);
+    if(!base)
+    {
+        printf("Pokemon not found, quitting.\n");
+        return false;
+    }
+
+    uint16_t new_def = (uint16_t)floor(((2 * base->defense + p->defense_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+    uint8_t packed[2];
+    packed[0] = (new_def >> 8) & 0xFF;
+    packed[1] = new_def & 0xFF;
+    
+    fseek(fp, p->offset_def, SEEK_SET);
+    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
+    
+    p->def_stat_exp[0] = hi;
+    p->def_stat_exp[1] = lo;
+    fseek(fp, p->offset_def_stat_exp, SEEK_SET);
+    int write2 = fwrite(&p->def_stat_exp, sizeof(p->def_stat_exp), 1, fp);
+
+    free(p);
+    if(write1 && write2)
+    {
+        calculate_checksum(fp);
+        return true;
+    }
+    return false;
+}
+
+bool edit_speed_xp(FILE *fp, bool party, int slot, int xp)
+{
+    if(xp > 0xFFFF)
+    {
+        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
+        return false;
+    }
+
+    uint16_t val = xp;
+    uint8_t lo = val & 0xFF;
+    uint8_t hi = (val >> 8) & 0xFF;
+
+    pokemon *p = load_pokemon(fp, party, slot);
+    const PokemonBaseStats *base = get_base_stats(p->name);
+    if(!base)
+    {
+        printf("Pokemon not found, quitting.\n");
+        return false;
+    }
+
+    uint16_t new_speed = (uint16_t)floor(((2 * base->speed + p->speed_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+    uint8_t packed[2];
+    packed[0] = (new_speed >> 8) & 0xFF;
+    packed[1] = new_speed & 0xFF;
+    
+    fseek(fp, p->offset_speed, SEEK_SET);
+    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
+    
+    p->speed_stat_exp[0] = hi;
+    p->speed_stat_exp[1] = lo;
+    fseek(fp, p->offset_speed_stat_exp, SEEK_SET);
+    int write2 = fwrite(&p->speed_stat_exp, sizeof(p->speed_stat_exp), 1, fp);
+
+    free(p);
+    if(write1 && write2)
+    {
+        calculate_checksum(fp);
+        return true;
+    }
+    return false;
+}
+
+bool edit_special_xp(FILE *fp, bool party, int slot, int xp)
+{
+    if(xp > 0xFFFF)
+    {
+        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
+        return false;
+    }
+
+    uint16_t val = xp;
+    uint8_t lo = val & 0xFF;
+    uint8_t hi = (val >> 8) & 0xFF;
+
+    pokemon *p = load_pokemon(fp, party, slot);
+    const PokemonBaseStats *base = get_base_stats(p->name);
+    if(!base)
+    {
+        printf("Pokemon not found, quitting.\n");
+        return false;
+    }
+
+    uint16_t new_special = (uint16_t)floor(((2 * base->special + p->special_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+    uint8_t packed[2];
+    packed[0] = (new_special >> 8) & 0xFF;
+    packed[1] = new_special & 0xFF;
+    
+    fseek(fp, p->offset_special, SEEK_SET);
+    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
+    
+    p->special_stat_exp[0] = hi;
+    p->special_stat_exp[1] = lo;
+    fseek(fp, p->offset_special_stat_exp, SEEK_SET);
+    int write2 = fwrite(&p->special_stat_exp, sizeof(p->special_stat_exp), 1, fp);
+
+    free(p);
+    if(write1 && write2)
+    {
+        calculate_checksum(fp);
+        return true;
+    }
+    return false;
+}
+
+bool edit_hp_xp(FILE *fp, bool party, int slot, int xp)
+{
+    if(xp > 0xFFFF)
+    {
+        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
+        return false;
+    }
+
+    uint16_t val = xp;
+    uint8_t lo = val & 0xFF;
+    uint8_t hi = (val >> 8) & 0xFF;
+
+    pokemon *p = load_pokemon(fp, party, slot);
+    const PokemonBaseStats *base = get_base_stats(p->name);
+    if(!base)
+    {
+        printf("Pokemon not found, quitting.\n");
+        return false;
+    }
+
+    uint16_t new_hp = (uint16_t)floor(((2 * base->hp + p->hp_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + p->level + 10);    
+    uint8_t packed[2];
+    packed[0] = (new_hp >> 8) & 0xFF;
+    packed[1] = new_hp & 0xFF;
+    
+    fseek(fp, p->offset_max_hp, SEEK_SET);
+    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
+    
+    p->hp_stat_exp[0] = hi;
+    p->hp_stat_exp[1] = lo;
+    fseek(fp, p->offset_hp_stat_exp, SEEK_SET);
+    int write2 = fwrite(&p->hp_stat_exp, sizeof(p->hp_stat_exp), 1, fp);
+
+    free(p);
+    if(write1 && write2)
+    {
+        calculate_checksum(fp);
+        return true;
+    }
+    return false;
+}
+
+//above stat xp functions are working however i think the formula is wrong because the end 
+//calculated results are off when i deposit and winthdraw a pokemon
+//however maxing out the xp stats does work 
+
+bool edit_xp_stat(FILE *fp, int stat_select, bool party, int slot, int xp)
+{
+    switch (stat_select)
+    {
+        case 1:
+            edit_attack_xp(fp, party, slot, xp);
+            break;
+        case 2:
+            edit_def_xp(fp, party, slot, xp);
+            break;
+        case 3:
+            edit_speed_xp(fp, party, slot, xp);
+            break;
+        case 4:
+            edit_special_xp(fp, party, slot, xp);
+            break;
+        case 5:
+            edit_hp_xp(fp, party, slot, xp);
+        case 0:
+            edit_attack_xp(fp, party, slot, xp);
+            edit_def_xp(fp, party, slot, xp);
+            edit_speed_xp(fp, party, slot, xp);
+            edit_special_xp(fp, party, slot, xp);
+            edit_hp_xp(fp, party, slot, xp);
+            break;
+        default:
+            printf("Not a valid selection, quitting.\n");
+            return false;
+    }
+    return true;
 }

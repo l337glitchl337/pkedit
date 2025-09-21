@@ -10,9 +10,10 @@ set(SRCS
   src/species.c
   src/editsav.c
   src/helpers.c
+  src/pkmnstructs.c
 )
 
 add_executable(pkedit ${SRCS})
-
+target_link_libraries(pkedit m)
 # Where to find headers like "foo.h"
 target_include_directories(pkedit PRIVATE src)
