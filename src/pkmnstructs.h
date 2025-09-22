@@ -71,10 +71,10 @@ typedef struct pokemon
     uint32_t offset_special;
 
     //DV/IVs
-    uint16_t special_iv;
-    uint16_t speed_iv;
-    uint16_t defense_iv;
-    uint16_t attack_iv;
+    uint8_t special_iv;
+    uint8_t speed_iv;
+    uint8_t defense_iv;
+    uint8_t attack_iv;
     uint8_t hp_iv; 
 
     uint16_t cal_cur_hp;

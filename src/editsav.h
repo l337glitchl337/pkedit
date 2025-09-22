@@ -12,6 +12,8 @@ bool edit_speed_xp(FILE *fp, bool party, int slot, int xp);
 bool edit_special_xp(FILE *fp, bool party, int slot, int xp);
 bool edit_hp_xp(FILE *fp, bool party, int slot, int xp);
 bool edit_xp_stat(FILE *fp, int stat_select, bool party, int slot, int xp);
+bool edit_iv_values(FILE *fp, bool party, int slot, int iv, uint8_t val);
+
 
 
 #endif

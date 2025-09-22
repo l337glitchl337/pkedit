@@ -401,3 +401,52 @@ bool edit_xp_stat(FILE *fp, int stat_select, bool party, int slot, int xp)
     }
     return true;
 }
+
+bool edit_iv_values(FILE *fp, bool party, int slot, int iv, uint8_t val)
+{
+    if(val > 0xF)
+    {
+        printf("Error: Integer overflow, value cannot exceed 15\n");
+        exit(1);
+    }
+
+    pokemon *p = load_pokemon(fp, party, slot);
+
+    switch (iv)
+    {
+        case 1:
+            p->attack_iv = val;
+            break;
+        case 2:
+            p->defense_iv = val;
+            break;
+        case 3:
+            p->speed_iv = val;
+            break;
+        case 4:
+            p->special_iv = val;
+            break;
+        case 0:
+            p->attack_iv = val;
+            p->defense_iv = val;
+            p->speed_iv = val;
+            p->special_iv = val;
+            break;
+        default:
+            printf("Error: IV/DV unknown, quitting.\n");
+            exit(1);
+    }
+    
+    p->iv_data[0] = (p->attack_iv << 4) | p->defense_iv;
+    p->iv_data[1] = (p->speed_iv << 4) | p->special_iv;
+    
+    fseek(fp, p->offset_iv_data, SEEK_SET);
+    int w = fwrite(&p->iv_data, sizeof(p->iv_data), 1, fp);
+    free(p);
+    if(w)
+    {
+        calculate_checksum(fp);
+        return true;
+    }
+    return false;
+}

@@ -18,7 +18,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    edit_xp_stat(fp, 0, true, 1, 0xffff);
+    edit_iv_values(fp, true, 2, 0, 15);
+    //edit_xp_stat(fp, 0, true, 1, 0xffff);
     
     //load_pokemon(fp, true, 4);
 

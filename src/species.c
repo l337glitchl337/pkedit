@@ -196,14 +196,13 @@ const char *species[0xBF] = {
 };
 
 const char *status_cond[0x41] = {
-        [0x04] = "Asleep",
-        [0x08] = "Poisoned",
-        [0x10] = "Burned",
-        [0x20] = "Frozen",
-        [0x40] = "Paralyzed",
-        [0x00] = "None"
-    
-    };
+    [0x04] = "Asleep",
+    [0x08] = "Poisoned",
+    [0x10] = "Burned",
+    [0x20] = "Frozen",
+    [0x40] = "Paralyzed",
+    [0x00] = "None"
+};
 
 const char *types[0x1B] = {
     [0x00] = "Normal",
