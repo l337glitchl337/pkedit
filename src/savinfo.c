@@ -310,8 +310,7 @@ void show_box_pokemon(FILE *fp)
     fread(&current_box_number, 1 ,1, fp);
     //only concerned with bits 0-7
     current_box_number = current_box_number & 0x07;
-    printf("current box: %u\n", current_box_number);
-    
+
     for(int i = 0; i < box_nums; i++)
     {
         if(i == current_box_number)
@@ -340,10 +339,13 @@ void show_box_pokemon(FILE *fp)
             fread(&box_pokemon, 1, 1, fp);
             printf("└──▶ %-15s\n", species[box_pokemon]);
         }
+        //once we finish the first bank we need to jump to the second bank
+        //bank 1 contains boxes 1-6 while bank 2 contains 7-12
         if (i == 5)
         {
             pos = BOX_OFFSET_7_12;
         }
+        //go onto the next box
         else
         {
             pos += box_size;
