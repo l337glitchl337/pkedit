@@ -11,5 +11,6 @@ void get_bag_items(FILE *fp);
 void get_party_members(FILE *fp);
 void get_player_badges(FILE *fp);
 void get_pokedex_summary(FILE *fp);
+void show_box_pokemon(FILE *fp);
 
 #endif

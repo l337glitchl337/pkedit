@@ -295,3 +295,58 @@ void get_pokedex_summary(FILE *fp)
     printf("%-15s [%i]\n", "Seen:", seen);
     printf("%-15s [%i]\n", "Owned", owned);
 }
+
+void show_box_pokemon(FILE *fp)
+{
+    int box_nums = 12;
+    int box_size = 0x462;
+    char label[10];
+    uint8_t current_box_number;
+    uint8_t box_count;
+    uint8_t box_pokemon;
+    uint32_t pos = BOX_OFFSET_1_6;
+
+    fseek(fp, CURRENT_BOX_NUMBER, SEEK_SET);
+    fread(&current_box_number, 1 ,1, fp);
+    //only concerned with bits 0-7
+    current_box_number = current_box_number & 0x07;
+    printf("current box: %u\n", current_box_number);
+    
+    for(int i = 0; i < box_nums; i++)
+    {
+        if(i == current_box_number)
+        {
+            fseek(fp, CURRENT_BOX_OFFSET, SEEK_SET);
+        }
+        else
+        {
+            fseek(fp, pos, SEEK_SET);
+        }
+        fread(&box_count, 1, 1, fp);
+
+        if(!box_count)
+        {
+            snprintf(label, sizeof(label), "Box: %i", i+1);
+            printf("%-15s [%s]\n", label, "EMPTY");
+        }
+        else
+        {
+            snprintf(label, sizeof(label), "Box: %i", i+1);
+            printf("%-15s [%i]\n", label, box_count);
+        }
+
+        for(int j = 0; j < box_count; j++)
+        {
+            fread(&box_pokemon, 1, 1, fp);
+            printf("└──▶ %-15s\n", species[box_pokemon]);
+        }
+        if (i == 5)
+        {
+            pos = BOX_OFFSET_7_12;
+        }
+        else
+        {
+            pos += box_size;
+        }
+    }
+}

@@ -18,14 +18,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    edit_iv_values(fp, true, 2, 0, 15);
-    //edit_xp_stat(fp, 0, true, 1, 0xffff);
-    
-    //load_pokemon(fp, true, 4);
-
-    get_party_members(fp);
-
-    //get_bag_items(fp);
+    show_box_pokemon(fp);
     fclose(fp);
     return 0;
 
