@@ -1,7 +1,7 @@
 #ifndef SAVINFO_H
 #define SAVINFO_H
 
-void show_sav_summary(char *filename, FILE *fp, int mode);
+void show_sav_summary(FILE *fp, int mode);
 void get_player_name(FILE *fp);
 void get_player_money(FILE *fp);
 void get_player_id(FILE *fp);

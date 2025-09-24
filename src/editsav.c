@@ -168,7 +168,7 @@ bool edit_attack_xp(FILE *fp, bool party, int slot, int xp)
     uint8_t lo = val & 0xFF;
     uint8_t hi = (val >> 8) & 0xFF;
 
-    pokemon *p = load_pokemon(fp, party, slot);
+    pokemon *p = load_pokemon(fp, party, slot, 1);
     const PokemonBaseStats *base = get_base_stats(p->name);
     if(!base)
     {
@@ -210,7 +210,7 @@ bool edit_def_xp(FILE *fp, bool party, int slot, int xp)
     uint8_t lo = val & 0xFF;
     uint8_t hi = (val >> 8) & 0xFF;
 
-    pokemon *p = load_pokemon(fp, party, slot);
+    pokemon *p = load_pokemon(fp, party, slot, 1);
     const PokemonBaseStats *base = get_base_stats(p->name);
     if(!base)
     {
@@ -252,7 +252,7 @@ bool edit_speed_xp(FILE *fp, bool party, int slot, int xp)
     uint8_t lo = val & 0xFF;
     uint8_t hi = (val >> 8) & 0xFF;
 
-    pokemon *p = load_pokemon(fp, party, slot);
+    pokemon *p = load_pokemon(fp, party, slot, 1);
     const PokemonBaseStats *base = get_base_stats(p->name);
     if(!base)
     {
@@ -294,7 +294,7 @@ bool edit_special_xp(FILE *fp, bool party, int slot, int xp)
     uint8_t lo = val & 0xFF;
     uint8_t hi = (val >> 8) & 0xFF;
 
-    pokemon *p = load_pokemon(fp, party, slot);
+    pokemon *p = load_pokemon(fp, party, slot, 1);
     const PokemonBaseStats *base = get_base_stats(p->name);
     if(!base)
     {
@@ -336,7 +336,7 @@ bool edit_hp_xp(FILE *fp, bool party, int slot, int xp)
     uint8_t lo = val & 0xFF;
     uint8_t hi = (val >> 8) & 0xFF;
 
-    pokemon *p = load_pokemon(fp, party, slot);
+    pokemon *p = load_pokemon(fp, party, slot, 1);
     const PokemonBaseStats *base = get_base_stats(p->name);
     if(!base)
     {
@@ -410,7 +410,7 @@ bool edit_iv_values(FILE *fp, bool party, int slot, int iv, uint8_t val)
         exit(1);
     }
 
-    pokemon *p = load_pokemon(fp, party, slot);
+    pokemon *p = load_pokemon(fp, party, slot, 1);
 
     switch (iv)
     {

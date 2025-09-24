@@ -18,7 +18,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    show_box_pokemon(fp);
+    show_sav_summary(fp, 1);
+    //get_party_members(fp);
+    //show_box_pokemon(fp);
     fclose(fp);
     return 0;
 
