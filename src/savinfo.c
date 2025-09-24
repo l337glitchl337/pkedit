@@ -141,7 +141,7 @@ void get_bag_items(FILE *fp)
 
 void get_party_members(FILE *fp)
 {
-    uint8_t party_count;
+    uint8_t party_count = 0;
     fseek(fp, PARTY_OFFSET, SEEK_SET);
     fread(&party_count, 1, 1, fp);
 

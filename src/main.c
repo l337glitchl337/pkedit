@@ -5,6 +5,9 @@
 #include "savinfo.h"
 #include "editsav.h"
 #include "helpers.h"
+//remove later, for testing
+#include "pkmnstructs.h"
+#include "species.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +21,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    show_sav_summary(fp, 1);
+    pokemon *p = load_pokemon(fp, false, 2, 1, 0);
+    printf("name: %s\n", p->name);
+    //show_sav_summary(fp, 1);
     //get_party_members(fp);
     //show_box_pokemon(fp);
     fclose(fp);
