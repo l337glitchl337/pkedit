@@ -114,6 +114,20 @@ typedef struct PokemonBaseStats{
     float avg;
 } PokemonBaseStats;
 
+typedef enum {
+    EXP_FAST,
+    EXP_MEDIUM_FAST,
+    EXP_MEDIUM_SLOW,
+    EXP_SLOW
+} ExpGroup;
+
+typedef struct {
+    const char *name;
+    ExpGroup group;
+} PokemonExpGroup;
+
+
 extern const PokemonBaseStats pokedex[];
+extern const PokemonExpGroup gen1_exp_groups[];
 
 #endif // PKMNSTRUCTS_H

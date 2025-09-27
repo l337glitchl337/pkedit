@@ -13,8 +13,7 @@ pokemon *load_party_pokemon(FILE *fp, uint8_t party_count)
         printf("Error while reading party size, expected 1-6 got %u\n", party_count);
         exit(1);
     }
-    printf("party count = %u\n", party_count);
-
+    
     pokemon *party = malloc(sizeof(pokemon) * party_count);
 
     for(int i = 0; i < party_count; i++)
@@ -59,8 +58,6 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
 {
     pokemon *p = malloc(sizeof(pokemon));
     slot -= 1;
-    printf("slot number: %i\n", slot);
-    //party_count -= 1;
     long offset = 0;
     if(!p)
     {
@@ -70,7 +67,6 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
 
     if(party)
     {
-        printf("is in party\n");
         fseek(fp, PARTY_OFFSET+1, SEEK_SET);
         offset = ((party_count + (slot * 44)) - slot) + (6 - party_count);
         if(party_count > 6 || party_count < 1 && party)
@@ -81,7 +77,6 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
     }
     else
     {
-        printf("is not in party");
         uint8_t current_box = 0;
         uint8_t box_count = 0;
         fseek(fp, CURRENT_BOX_NUMBER, SEEK_SET);
@@ -205,7 +200,7 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
 
     p->cal_cur_hp = (p->current_hp[0] << 8) | p->current_hp[1];
     p->cal_ot_id = (p->orig_trainer_id[0] << 8) | p->orig_trainer_id[1];
-    p->cal_exp = (p->exp[0] << 16) | (p->exp[1] << 8) | p->exp[3];
+    p->cal_exp = (p->exp[0] << 16) | (p->exp[1] << 8) | p->exp[2];
     p->cal_hp_xp = (p->hp_stat_exp[0] << 8) | p->hp_stat_exp[1];
     p->cal_atk_xp = (p->atk_stat_exp[0] << 8) | p->atk_stat_exp[1];
     p->cal_def_xp = (p->def_stat_exp[0] << 8) | p->def_stat_exp[1];
@@ -240,4 +235,34 @@ const PokemonBaseStats *get_base_stats(const char *name)
         }
     }
     return NULL;
+}
+
+uint8_t get_level_from_exp(uint32_t exp, int group) {
+    for (uint8_t level = 1; level <= 100; level++) {
+        uint32_t required;
+        switch (group) {
+            case EXP_MEDIUM_FAST:
+                required = level * level * level;
+                break;
+            case EXP_FAST:
+                required = (4 * level * level * level) / 5;
+                break;
+            case EXP_SLOW:
+                required = (5 * level * level * level) / 4;
+                break;
+            case EXP_MEDIUM_SLOW:
+                required = (6 * level * level * level) / 5
+                         - 15 * level * level
+                         + 100 * level
+                         - 140;
+                if ((int32_t)required < 0) required = 0; // clamp
+                break;
+            default:
+                return 0; // invalid group
+        }
+
+        if (required == exp) return level;
+        if (required > exp)  return level - 1;
+    }
+    return 100;
 }

@@ -21,11 +21,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    pokemon *p = load_pokemon(fp, false, 2, 1, 0);
-    printf("name: %s\n", p->name);
-    //show_sav_summary(fp, 1);
-    //get_party_members(fp);
-    //show_box_pokemon(fp);
+    for(int i = 0; i < 20; i++)
+    {
+        pokemon *p = load_pokemon(fp, false, 1, i+1, 0);
+        show_pokemon_summary(fp, p, false);
+    }
+
     fclose(fp);
     return 0;
 

@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
 #include "species.h"
 #include "charset.h"
 #include "items.h"
@@ -150,47 +152,9 @@ void get_party_members(FILE *fp)
     for(int i = 0; i < party_count; i++)
     {
         char label[10];
-        snprintf(label, sizeof(label), "Slot %i", i + 1);
-        printf("%-20s [%s]\n\n", label, species[party[i].species]);
-        
-        printf("Stats\n");
-        printf("└──▶ %-15s [%u]\n", "Current Level:", party[i].level);
-        printf("└──▶ %-15s [%u/%u]\n", "Current HP:", party[i].cal_cur_hp, party[i].cal_max_hp);
-        printf("└──▶ %-15s [%u]\n", "Attack:", party[i].cal_attack);
-        printf("└──▶ %-15s [%u]\n", "Defense:", party[i].cal_defense);
-        printf("└──▶ %-15s [%u]\n", "Speed:", party[i].cal_speed);
-        printf("└──▶ %-15s [%u]\n\n", "Special:", party[i].cal_special);
-
-        printf("IV/DVs\n");
-        printf("└──▶ %-15s [%u]\n", "HP IV:", party[i].hp_iv);
-        printf("└──▶ %-15s [%u]\n", "Attack IV:", party[i].attack_iv);
-        printf("└──▶ %-15s [%u]\n", "Defense IV:", party[i].defense_iv);
-        printf("└──▶ %-15s [%u]\n", "Speed IV:", party[i].speed_iv);
-        printf("└──▶ %-15s [%u]\n\n", "Special IV:", party[i].special_iv);
-
-
-        printf("Moves\n");
-        printf("└──▶ %-15s [%s]\n", "Move 1:", moves[party[i].move1]);
-        printf("└──▶ %-15s [%s]\n", "Move 2:", moves[party[i].move2]);
-        printf("└──▶ %-15s [%s]\n", "Move 3:", moves[party[i].move3]);
-        printf("└──▶ %-15s [%s]\n\n", "Move 4:", moves[party[i].move4]);
-
-        printf("Experience\n");
-        printf("└──▶ %-15s [%u]\n", "Exp.:", party[i].cal_exp);
-        printf("└──▶ %-15s [%u]\n", "HP XP:", party[i].cal_hp_xp);
-        printf("└──▶ %-15s [%u]\n", "Atk XP:", party[i].cal_atk_xp);
-        printf("└──▶ %-15s [%u]\n", "Def XP:", party[i].cal_def_xp);
-        printf("└──▶ %-15s [%u]\n", "Speed XP:", party[i].cal_speed_xp);
-        printf("└──▶ %-15s [%u]\n\n", "Special XP:", party[i].cal_special_xp);
-
-        printf("Type\n");
-        printf("└──▶ %-15s [%s]\n", "Type 1:", types[party[i].type1]);
-        printf("└──▶ %-15s [%s]\n\n", "Type 2:", types[party[i].type2]);
-        
-        printf("Misc.\n");
-        printf("└──▶ %-15s [%s]\n", "Status Con:", status_cond[party[i].status_cond]);
-        printf("└──▶ %-15s [%02X]\n", "Held Item:", party[i].catch_rate_held_item);
-        printf("└──▶ %-15s [%u]\n\n", "OT ID:", party[i].cal_ot_id);
+        snprintf(label, sizeof(label), "Slot: %i", i+1);
+        printf("%-20s [%s]\n\n", label, party[i].name);
+        show_pokemon_summary(fp, &party[i], true);
     }
     free(party);
 }
@@ -319,4 +283,76 @@ void show_box_pokemon(FILE *fp)
             pos += box_size;
         }
     }
+}
+
+void show_pokemon_summary(FILE *fp, pokemon *p, bool party)
+{
+    if(!p->name)
+    {
+        printf("Error: Unable to load pokemon struct, quitting.");
+        exit(1);
+    }
+
+
+    if(!party)
+    {
+        ExpGroup exp_group;
+        uint8_t level = 0;
+        for(int i = 0; i < 151; i++)
+        {
+            if(strcmp(gen1_exp_groups[i].name, p->name) == 0)
+            {
+                printf("%s\n", gen1_exp_groups[i].name);
+                exp_group = gen1_exp_groups[i].group;
+                break;
+            }
+        }
+
+        p->level = get_level_from_exp(p->cal_exp, exp_group);
+        const PokemonBaseStats *base = get_base_stats(p->name);
+        p->cal_attack = (uint16_t)floor(((2 * base->attack + p->attack_iv + floor(sqrt((double)p->cal_atk_xp) / 4)) * p->level / 100) + 5);
+        p->cal_defense = (uint16_t)floor(((2 * base->defense + p->defense_iv + floor(sqrt((double)p->cal_def_xp) / 4)) * p->level / 100) + 5);
+        p->cal_speed = (uint16_t)floor(((2 * base->speed + p->speed_iv + floor(sqrt((double)p->cal_speed_xp) / 4)) * p->level / 100) + 5);
+        p->cal_special = (uint16_t)floor(((2 * base->special + p->special_iv + floor(sqrt((double)p->cal_special_xp) / 4)) * p->level / 100) + 5);
+    }
+
+    printf("Stats\n");
+    printf("└──▶ %-15s [%u]\n", "Current Level:", p->level);
+    printf("└──▶ %-15s [%u/%u]\n", "Current HP:", p->cal_cur_hp, p->cal_max_hp);
+    printf("└──▶ %-15s [%u]\n", "Attack:", p->cal_attack);
+    printf("└──▶ %-15s [%u]\n", "Defense:", p->cal_defense);
+    printf("└──▶ %-15s [%u]\n", "Speed:", p->cal_speed);
+    printf("└──▶ %-15s [%u]\n\n", "Special:", p->cal_special);
+
+    printf("IV/DVs\n");
+    printf("└──▶ %-15s [%u]\n", "HP IV:", p->hp_iv);
+    printf("└──▶ %-15s [%u]\n", "Attack IV:", p->attack_iv);
+    printf("└──▶ %-15s [%u]\n", "Defense IV:", p->defense_iv);
+    printf("└──▶ %-15s [%u]\n", "Speed IV:", p->speed_iv);
+    printf("└──▶ %-15s [%u]\n\n", "Special IV:", p->special_iv);
+
+
+    printf("Moves\n");
+    printf("└──▶ %-15s [%s]\n", "Move 1:", moves[p->move1]);
+    printf("└──▶ %-15s [%s]\n", "Move 2:", moves[p->move2]);
+    printf("└──▶ %-15s [%s]\n", "Move 3:", moves[p->move3]);
+    printf("└──▶ %-15s [%s]\n\n", "Move 4:", moves[p->move4]);
+
+    printf("Experience\n");
+    printf("└──▶ %-15s [%u]\n", "Exp.:", p->cal_exp);
+    printf("└──▶ %-15s [%u]\n", "HP XP:", p->cal_hp_xp);
+    printf("└──▶ %-15s [%u]\n", "Atk XP:", p->cal_atk_xp);
+    printf("└──▶ %-15s [%u]\n", "Def XP:", p->cal_def_xp);
+    printf("└──▶ %-15s [%u]\n", "Speed XP:", p->cal_speed_xp);
+    printf("└──▶ %-15s [%u]\n\n", "Special XP:", p->cal_special_xp);
+
+    printf("Type\n");
+    printf("└──▶ %-15s [%s]\n", "Type 1:", types[p->type1]);
+    printf("└──▶ %-15s [%s]\n\n", "Type 2:", types[p->type2]);
+    
+    printf("Misc.\n");
+    printf("└──▶ %-15s [%s]\n", "Status Con:", status_cond[p->status_cond]);
+    printf("└──▶ %-15s [%02X]\n", "Held Item:", p->catch_rate_held_item);
+    printf("└──▶ %-15s [%u]\n\n", "OT ID:", p->cal_ot_id);
+
 }
