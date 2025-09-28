@@ -156,281 +156,42 @@ bool max_item(FILE *fp, uint8_t item)
     }
 }
 
-bool edit_attack_xp(FILE *fp, bool party, int slot, int xp)
+bool edit_iv_values(FILE *fp, pokemon *p, int iv, int val, int pokemon_location)
 {
-    if(xp > 0xFFFF)
-    {
-        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
-        return false;
-    }
 
-    uint16_t val = xp;
-    uint8_t lo = val & 0xFF;
-    uint8_t hi = (val >> 8) & 0xFF;
-
-    pokemon *p = load_pokemon(fp, party, 0, slot, 1);
-    const PokemonBaseStats *base = get_base_stats(p->name);
-    if(!base)
-    {
-        printf("Pokemon not found, quitting.\n");
-        return false;
-    }
-
-    uint16_t new_attack = (uint16_t)floor(((2 * base->attack + p->attack_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-    uint8_t packed[2];
-    packed[0] = (new_attack >> 8) & 0xFF;
-    packed[1] = new_attack & 0xFF;
-
-    fseek(fp, p->offset_atk, SEEK_SET);
-    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
-    
-    p->atk_stat_exp[0] = hi;
-    p->atk_stat_exp[1] = lo;
-    fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
-    int write2 = fwrite(&p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
-
-    free(p);
-    if(write1 && write2)
-    {
-        calculate_checksum(fp);
-        return true;
-    }
-    return false;
-}
-
-bool edit_def_xp(FILE *fp, bool party, int slot, int xp)
-{
-   if(xp > 0xFFFF)
-    {
-        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
-        return false;
-    }
-
-    uint16_t val = xp;
-    uint8_t lo = val & 0xFF;
-    uint8_t hi = (val >> 8) & 0xFF;
-
-    pokemon *p = load_pokemon(fp, party, 0, slot, 1);
-    const PokemonBaseStats *base = get_base_stats(p->name);
-    if(!base)
-    {
-        printf("Pokemon not found, quitting.\n");
-        return false;
-    }
-
-    uint16_t new_def = (uint16_t)floor(((2 * base->defense + p->defense_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-    uint8_t packed[2];
-    packed[0] = (new_def >> 8) & 0xFF;
-    packed[1] = new_def & 0xFF;
-    
-    fseek(fp, p->offset_def, SEEK_SET);
-    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
-    
-    p->def_stat_exp[0] = hi;
-    p->def_stat_exp[1] = lo;
-    fseek(fp, p->offset_def_stat_exp, SEEK_SET);
-    int write2 = fwrite(&p->def_stat_exp, sizeof(p->def_stat_exp), 1, fp);
-
-    free(p);
-    if(write1 && write2)
-    {
-        calculate_checksum(fp);
-        return true;
-    }
-    return false;
-}
-
-bool edit_speed_xp(FILE *fp, bool party, int slot, int xp)
-{
-    if(xp > 0xFFFF)
-    {
-        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
-        return false;
-    }
-
-    uint16_t val = xp;
-    uint8_t lo = val & 0xFF;
-    uint8_t hi = (val >> 8) & 0xFF;
-
-    pokemon *p = load_pokemon(fp, party, 0, slot, 1);
-    const PokemonBaseStats *base = get_base_stats(p->name);
-    if(!base)
-    {
-        printf("Pokemon not found, quitting.\n");
-        return false;
-    }
-
-    uint16_t new_speed = (uint16_t)floor(((2 * base->speed + p->speed_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-    uint8_t packed[2];
-    packed[0] = (new_speed >> 8) & 0xFF;
-    packed[1] = new_speed & 0xFF;
-    
-    fseek(fp, p->offset_speed, SEEK_SET);
-    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
-    
-    p->speed_stat_exp[0] = hi;
-    p->speed_stat_exp[1] = lo;
-    fseek(fp, p->offset_speed_stat_exp, SEEK_SET);
-    int write2 = fwrite(&p->speed_stat_exp, sizeof(p->speed_stat_exp), 1, fp);
-
-    free(p);
-    if(write1 && write2)
-    {
-        calculate_checksum(fp);
-        return true;
-    }
-    return false;
-}
-
-bool edit_special_xp(FILE *fp, bool party, int slot, int xp)
-{
-    if(xp > 0xFFFF)
-    {
-        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
-        return false;
-    }
-
-    uint16_t val = xp;
-    uint8_t lo = val & 0xFF;
-    uint8_t hi = (val >> 8) & 0xFF;
-
-    pokemon *p = load_pokemon(fp, party, 0, slot, 1);
-    const PokemonBaseStats *base = get_base_stats(p->name);
-    if(!base)
-    {
-        printf("Pokemon not found, quitting.\n");
-        return false;
-    }
-
-    uint16_t new_special = (uint16_t)floor(((2 * base->special + p->special_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-    uint8_t packed[2];
-    packed[0] = (new_special >> 8) & 0xFF;
-    packed[1] = new_special & 0xFF;
-    
-    fseek(fp, p->offset_special, SEEK_SET);
-    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
-    
-    p->special_stat_exp[0] = hi;
-    p->special_stat_exp[1] = lo;
-    fseek(fp, p->offset_special_stat_exp, SEEK_SET);
-    int write2 = fwrite(&p->special_stat_exp, sizeof(p->special_stat_exp), 1, fp);
-
-    free(p);
-    if(write1 && write2)
-    {
-        calculate_checksum(fp);
-        return true;
-    }
-    return false;
-}
-
-bool edit_hp_xp(FILE *fp, bool party, int slot, int xp)
-{
-    if(xp > 0xFFFF)
-    {
-        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
-        return false;
-    }
-
-    uint16_t val = xp;
-    uint8_t lo = val & 0xFF;
-    uint8_t hi = (val >> 8) & 0xFF;
-
-    pokemon *p = load_pokemon(fp, party, 0, slot, 1);
-    const PokemonBaseStats *base = get_base_stats(p->name);
-    if(!base)
-    {
-        printf("Pokemon not found, quitting.\n");
-        return false;
-    }
-
-    uint16_t new_hp = (uint16_t)floor(((2 * base->hp + p->hp_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + p->level + 10);    
-    uint8_t packed[2];
-    packed[0] = (new_hp >> 8) & 0xFF;
-    packed[1] = new_hp & 0xFF;
-    
-    fseek(fp, p->offset_max_hp, SEEK_SET);
-    int write1 = fwrite(&packed, sizeof(packed), 1, fp);
-    
-    p->hp_stat_exp[0] = hi;
-    p->hp_stat_exp[1] = lo;
-    fseek(fp, p->offset_hp_stat_exp, SEEK_SET);
-    int write2 = fwrite(&p->hp_stat_exp, sizeof(p->hp_stat_exp), 1, fp);
-
-    free(p);
-    if(write1 && write2)
-    {
-        calculate_checksum(fp);
-        return true;
-    }
-    return false;
-}
-
-//above stat xp functions are working however i think the formula is wrong because the end 
-//calculated results are off when i deposit and winthdraw a pokemon
-//however maxing out the xp stats does work 
-
-bool edit_xp_stat(FILE *fp, int stat_select, bool party, int slot, int xp)
-{
-    switch (stat_select)
-    {
-        case 1:
-            edit_attack_xp(fp, party, slot, xp);
-            break;
-        case 2:
-            edit_def_xp(fp, party, slot, xp);
-            break;
-        case 3:
-            edit_speed_xp(fp, party, slot, xp);
-            break;
-        case 4:
-            edit_special_xp(fp, party, slot, xp);
-            break;
-        case 5:
-            edit_hp_xp(fp, party, slot, xp);
-        case 0:
-            edit_attack_xp(fp, party, slot, xp);
-            edit_def_xp(fp, party, slot, xp);
-            edit_speed_xp(fp, party, slot, xp);
-            edit_special_xp(fp, party, slot, xp);
-            edit_hp_xp(fp, party, slot, xp);
-            break;
-        default:
-            printf("Not a valid selection, quitting.\n");
-            return false;
-    }
-    return true;
-}
-
-bool edit_iv_values(FILE *fp, bool party, int slot, int iv, uint8_t val)
-{
     if(val > 0xF)
     {
         printf("Error: Integer overflow, value cannot exceed 15\n");
         exit(1);
     }
 
-    pokemon *p = load_pokemon(fp, party, 0, slot, 1);
-
     switch (iv)
     {
-        case 1:
+        case ATTACK_IV:
             p->attack_iv = val;
+            calc_new_stat(fp, p, ATTACK, val);
             break;
-        case 2:
+        case DEFENSE_IV:
             p->defense_iv = val;
+            calc_new_stat(fp, p, DEFENSE, val);
             break;
-        case 3:
+        case SPEED_IV:
             p->speed_iv = val;
+            calc_new_stat(fp, p, SPEED, val);
             break;
-        case 4:
+        case SPECIAL_IV:
             p->special_iv = val;
+            calc_new_stat(fp, p, SPECIAL, val);
             break;
-        case 0:
+        case ALL_IVS:
             p->attack_iv = val;
             p->defense_iv = val;
             p->speed_iv = val;
             p->special_iv = val;
+            for(StatSelection stat = ATTACK; stat <= HP; stat++)
+            {
+                calc_new_stat(fp, p, stat, val);
+            }
             break;
         default:
             printf("Error: IV/DV unknown, quitting.\n");
@@ -449,4 +210,161 @@ bool edit_iv_values(FILE *fp, bool party, int slot, int iv, uint8_t val)
         return true;
     }
     return false;
+}
+
+bool edit_xp_values(FILE *fp, pokemon *p, int stat_select, int pokemon_location, int xp)
+{
+    if(xp > 0xFFFF)
+    {
+        printf("Error: Integer overflow, value cannot exceed %u\n", 0xFFFF);
+        return false;
+    }
+
+    uint16_t val = xp;
+    uint8_t lo = val & 0xFF;
+    uint8_t hi = (val >> 8) & 0xFF;
+    uint8_t packed[2];
+
+    const PokemonBaseStats *base = get_base_stats(p->name);
+    if(!base)
+    {
+        printf("Pokemon not found, quitting.\n");
+        return false;
+    }
+
+    if(pokemon_location == IN_PARTY)
+    {
+        switch (stat_select)
+        {
+            case ATTACK_XP:
+                uint16_t new_attack = (uint16_t)floor(((2 * base->attack + p->attack_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+                packed[0] = (new_attack >> 8) & 0xFF;
+                packed[1] = new_attack & 0xFF;
+                p->atk_stat_exp[0] = hi;
+                p->atk_stat_exp[1] = lo;
+                fseek(fp, p->offset_atk, SEEK_SET);
+                fwrite(&packed, sizeof(packed), 1, fp);
+                fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
+                fwrite(&p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
+                break;
+            case DEFENSE_XP:
+                uint16_t new_def = (uint16_t)floor(((2 * base->defense + p->defense_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+                packed[0] = (new_def >> 8) & 0xFF;
+                packed[1] = new_def & 0xFF;
+                p->def_stat_exp[0] = hi;
+                p->def_stat_exp[1] = lo;
+                fseek(fp, p->offset_def, SEEK_SET);
+                fwrite(&packed, sizeof(packed), 1, fp);
+                fseek(fp, p->offset_def_stat_exp, SEEK_SET);
+                fwrite(&p->def_stat_exp, sizeof(p->def_stat_exp), 1, fp);
+                break;
+            case SPEED_XP:
+                uint16_t new_speed = (uint16_t)floor(((2 * base->speed + p->speed_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+                packed[0] = (new_speed >> 8) & 0xFF;
+                packed[1] = new_speed & 0xFF;
+                p->speed_stat_exp[0] = hi;
+                p->speed_stat_exp[1] = lo;
+                fseek(fp, p->offset_speed, SEEK_SET);
+                fwrite(&packed, sizeof(packed), 1, fp);
+                fseek(fp, p->offset_speed_stat_exp, SEEK_SET);
+                fwrite(&p->speed_stat_exp, sizeof(p->speed_stat_exp), 1, fp);
+                break;
+            case SPECIAL_XP:
+                uint16_t new_special = (uint16_t)floor(((2 * base->special + p->special_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
+                packed[0] = (new_special >> 8) & 0xFF;
+                packed[1] = new_special & 0xFF;
+                p->special_stat_exp[0] = hi;
+                p->special_stat_exp[1] = lo;
+                fseek(fp, p->offset_special, SEEK_SET);
+                fwrite(&packed, sizeof(packed), 1, fp);
+                fseek(fp, p->offset_special_stat_exp, SEEK_SET);
+                fwrite(&p->special_stat_exp, sizeof(p->special_stat_exp), 1, fp);
+                break;
+            case HP_XP:
+                uint16_t new_hp = (uint16_t)floor(((2 * base->hp + p->hp_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + p->level + 10);    
+                packed[0] = (new_hp >> 8) & 0xFF;
+                packed[1] = new_hp & 0xFF;
+                p->hp_stat_exp[0] = hi;
+                p->hp_stat_exp[1] = lo;
+                fseek(fp, p->offset_max_hp, SEEK_SET);
+                fwrite(&packed, sizeof(packed), 1, fp);
+                fseek(fp, p->offset_hp_stat_exp, SEEK_SET);
+                fwrite(&p->hp_stat_exp, sizeof(p->hp_stat_exp), 1, fp);
+                break;
+            case ALL_XPS:
+                //todo
+                break;
+            default:
+                printf("Error: Invalid stat selection, quitting.\n");
+                exit(1);
+
+        int write1 = fwrite(&packed, sizeof(packed), 1, fp);
+        if(!write1)
+        {
+            printf("Error: Error occurred while writing to save file, quitting\n");
+            exit(1);
+        }
+
+        fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
+        fwrite(&p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
+        }
+    }
+    else
+    {
+        switch (stat_select)
+        {
+            case ATTACK_XP:
+                p->atk_stat_exp[0] = hi;
+                p->atk_stat_exp[1] = lo;
+                fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
+                fwrite(p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
+                break;
+            case DEFENSE_XP:
+                p->def_stat_exp[0] = hi;
+                p->def_stat_exp[1] = lo;
+                fseek(fp, p->offset_def_stat_exp, SEEK_SET);
+                fwrite(p->def_stat_exp, sizeof(p->def_stat_exp), 1, fp);
+                break;
+            case SPEED_XP:
+                p->speed_stat_exp[0] = hi;
+                p->speed_stat_exp[1] = lo;
+                fseek(fp, p->offset_speed_stat_exp, SEEK_SET);
+                fwrite(p->speed_stat_exp, sizeof(p->speed_stat_exp), 1, fp);
+                break;
+            case SPECIAL_XP:
+                p->special_stat_exp[0] = hi;
+                p->special_stat_exp[1] = lo;
+                fseek(fp, p->offset_special_stat_exp, SEEK_SET);
+                fwrite(&p->special_stat_exp, sizeof(p->special_stat_exp), 1, fp);
+                break;
+            case HP_XP:
+                p->hp_stat_exp[0] = hi;
+                p->hp_stat_exp[1] = lo;
+                fseek(fp, p->offset_hp_stat_exp, SEEK_SET);
+                fwrite(&p->hp_stat_exp, sizeof(p->hp_stat_exp), 1, fp);
+                break;
+            case ALL_XPS:
+                //todo
+                break;
+            default:
+                printf("Error: Invalid stat selection, quitting.\n");
+                exit(1);
+
+        }
+    }
+
+    calculate_checksum(fp);
+    return true;
+}
+
+bool edit_pokemon(FILE *fp, pokemon *p, int stat_selection, int pokemon_location, int stat_value)
+{
+    if(stat_selection <= 5)
+    {
+        edit_xp_values(fp, p, stat_selection, pokemon_location, stat_value);
+    }
+    else
+    {
+        edit_iv_values(fp, p, stat_selection, stat_value, pokemon_location);
+    }
 }

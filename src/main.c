@@ -21,13 +21,14 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    for(int i = 0; i < 20; i++)
-    {
-        pokemon *p = load_pokemon(fp, false, 1, i+1, 0);
-        show_pokemon_summary(fp, p, false);
-    }
+/*     pokemon *p = load_pokemon(fp, true, 0, 6, 1);
 
-    fclose(fp);
+    for(StatSelection stat = ATTACK_XP; stat <= HP_XP; stat++)
+    {
+        edit_pokemon(fp, p, stat, IN_PARTY, 65535);
+    } */
+
+    get_party_members(fp);
     return 0;
 
     /* uint16_t chk = calculate_checksum(fp);

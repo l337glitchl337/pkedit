@@ -121,6 +121,34 @@ typedef enum {
     EXP_SLOW
 } ExpGroup;
 
+typedef enum {
+    IN_PARTY,
+    IN_BOX
+} PokemonLocation;
+
+typedef enum
+{
+    ATTACK_XP,
+    DEFENSE_XP,
+    SPEED_XP,
+    SPECIAL_XP,
+    HP_XP,
+    ALL_XPS,
+    ATTACK_IV,  
+    DEFENSE_IV,
+    SPEED_IV,
+    SPECIAL_IV,
+    ALL_IVS,
+    ATTACK,
+    DEFENSE,
+    SPEED,
+    SPECIAL,
+    HP
+
+} StatSelection;
+
+
+
 typedef struct {
     const char *name;
     ExpGroup group;
@@ -130,4 +158,4 @@ typedef struct {
 extern const PokemonBaseStats pokedex[];
 extern const PokemonExpGroup gen1_exp_groups[];
 
-#endif // PKMNSTRUCTS_H
+#endif
