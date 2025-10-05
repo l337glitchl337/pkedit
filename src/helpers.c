@@ -19,7 +19,7 @@ pokemon *load_party_pokemon(FILE *fp, uint8_t party_count)
 
     for(int i = 0; i < party_count; i++)
     {
-        pokemon *p = load_pokemon(fp, true, 0, i+1, party_count);
+        pokemon *p = load_pokemon(fp, IN_PARTY, 0, i+1, party_count);
         party[i] = *p;
         free(p);
     }
@@ -55,7 +55,7 @@ pokemon *load_box_pokemon(FILE *fp, int n)
     exit(1);
 }
 
-pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_count)
+pokemon *load_pokemon(FILE *fp, PokemonLocation location, int box, int slot, uint8_t party_count)
 {
     pokemon *p = malloc(sizeof(pokemon));
     slot -= 1;
@@ -66,11 +66,11 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
         exit(1);
     }
 
-    if(party)
+    if(location == IN_PARTY)
     {
         fseek(fp, PARTY_OFFSET+1, SEEK_SET);
         offset = ((party_count + (slot * 44)) - slot) + (6 - party_count);
-        if(party_count > 6 || party_count < 1 && party)
+        if(party_count > 6 || party_count < 1)
         {
             printf("Unexpected party count, quitting.\n");
             exit(1);
@@ -92,7 +92,6 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
         }
         else if(box <= 6)
         {
-            printf ("box 1-6\n");
             fseek(fp, BOX_OFFSET_1_6, SEEK_SET);
             fread(&box_count, 1, 1, fp);
         }
@@ -174,7 +173,7 @@ pokemon *load_pokemon(FILE *fp, bool party, int box, int slot, uint8_t party_cou
     p->offset_move4_pp = ftell(fp);
     fread(&p->move4_pp, 1, 1, fp);
 
-    if(party)
+    if(location == IN_PARTY)
     {
         //level data
         p->offset_level = ftell(fp);

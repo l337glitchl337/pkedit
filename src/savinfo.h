@@ -14,6 +14,6 @@ void get_party_members(FILE *fp);
 void get_player_badges(FILE *fp);
 void get_pokedex_summary(FILE *fp);
 void show_box_pokemon(FILE *fp);
-void show_pokemon_summary(FILE *fp, pokemon *p, bool party);
+void show_pokemon_summary(FILE *fp, pokemon *p, PokemonLocation location);
 
 #endif

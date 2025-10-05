@@ -269,7 +269,10 @@ void show_box_pokemon(FILE *fp)
         for(int j = 0; j < box_count; j++)
         {
             fread(&box_pokemon, 1, 1, fp);
-            printf("└──▶ %-15s\n", species[box_pokemon]);
+            //printf("└──▶ %-15s\n", species[box_pokemon]);
+            pokemon *p = load_pokemon(fp, IN_BOX, i+1, j+1, 0);
+            show_pokemon_summary(fp, p, IN_BOX);
+            free(p);
         }
         //once we finish the first bank we need to jump to the second bank
         //bank 1 contains boxes 1-6 while bank 2 contains 7-12
@@ -285,16 +288,16 @@ void show_box_pokemon(FILE *fp)
     }
 }
 
-void show_pokemon_summary(FILE *fp, pokemon *p, bool party)
+void show_pokemon_summary(FILE *fp, pokemon *p, PokemonLocation location)
 {
     if(!p->name)
     {
-        printf("Error: Unable to load pokemon struct, quitting.");
+        printf("Error: Unable to load pokemon struct, quitting.\n");
         exit(1);
     }
 
 
-    if(!party)
+    if(location != IN_PARTY)
     {
         ExpGroup exp_group;
         uint8_t level = 0;
@@ -310,15 +313,16 @@ void show_pokemon_summary(FILE *fp, pokemon *p, bool party)
 
         p->level = get_level_from_exp(p->cal_exp, exp_group);
         const PokemonBaseStats *base = get_base_stats(p->name);
-        p->cal_attack = (uint16_t)floor(((2 * base->attack + p->attack_iv + floor(sqrt((double)p->cal_atk_xp) / 4)) * p->level / 100) + 5);
-        p->cal_defense = (uint16_t)floor(((2 * base->defense + p->defense_iv + floor(sqrt((double)p->cal_def_xp) / 4)) * p->level / 100) + 5);
-        p->cal_speed = (uint16_t)floor(((2 * base->speed + p->speed_iv + floor(sqrt((double)p->cal_speed_xp) / 4)) * p->level / 100) + 5);
-        p->cal_special = (uint16_t)floor(((2 * base->special + p->special_iv + floor(sqrt((double)p->cal_special_xp) / 4)) * p->level / 100) + 5);
+        p->cal_attack = (uint16_t)floor((((base->attack + p->attack_iv) * 2 + floor(sqrt((double)p->cal_atk_xp) / 4)) * p->level / 100) + 5);
+        p->cal_defense = (uint16_t)floor((((base->defense + p->defense_iv) * 2 + floor(sqrt((double)p->cal_def_xp) / 4)) * p->level / 100) + 5);
+        p->cal_speed = (uint16_t)floor((((base->speed + p->speed_iv) * 2 + floor(sqrt((double)p->cal_speed_xp) / 4)) * p->level / 100) + 5);
+        p->cal_special = (uint16_t)floor((((base->special + p->special_iv) * 2 + floor(sqrt((double)p->cal_special_xp) / 4)) * p->level / 100) + 5);
+
     }
 
     printf("Stats\n");
     printf("└──▶ %-15s [%u]\n", "Current Level:", p->level);
-    printf("└──▶ %-15s [%u/%u]\n", "Current HP:", p->cal_cur_hp, p->cal_max_hp);
+    printf("└──▶ %-15s [%u]\n", "Current HP:", p->cal_cur_hp);
     printf("└──▶ %-15s [%u]\n", "Attack:", p->cal_attack);
     printf("└──▶ %-15s [%u]\n", "Defense:", p->cal_defense);
     printf("└──▶ %-15s [%u]\n", "Speed:", p->cal_speed);
