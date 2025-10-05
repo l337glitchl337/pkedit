@@ -21,13 +21,13 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-/*     pokemon *p = load_pokemon(fp, true, 0, 6, 1);
+    pokemon *p = load_pokemon(fp, true, 0, 1, 1);
+    //edit_pokemon(fp, p, ALL_IVS, IN_PARTY, 15);
 
     for(StatSelection stat = ATTACK_XP; stat <= HP_XP; stat++)
     {
         edit_pokemon(fp, p, stat, IN_PARTY, 65535);
-    } */
-
+    }
     get_party_members(fp);
     return 0;
 

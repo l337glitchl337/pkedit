@@ -268,7 +268,7 @@ uint8_t get_level_from_exp(uint32_t exp, int group) {
     return 100;
 }
 
-bool calc_new_stat(FILE *fp, pokemon *p, int stat_selection, int val)
+bool calc_new_stat(FILE *fp, pokemon *p, int stat_selection)
 {
     const PokemonBaseStats *base = get_base_stats(p->name);
     uint16_t new_stat = 0;
@@ -276,23 +276,23 @@ bool calc_new_stat(FILE *fp, pokemon *p, int stat_selection, int val)
     switch (stat_selection)
     {
         case ATTACK:
-            new_stat = (uint16_t)floor(((2 * base->attack + val + floor(sqrt((double)p->cal_atk_xp) / 4)) * p->level / 100) + 5);
+            new_stat = (uint16_t)floor((((base->attack + p->attack_iv) * 2 + floor(sqrt((double)p->cal_atk_xp) / 4)) * p->level / 100) + 5);
             fseek(fp, p->offset_atk, SEEK_SET);
             break;
         case DEFENSE:
-            new_stat = (uint16_t)floor(((2 * base->defense + val + floor(sqrt((double)p->cal_def_xp) / 4)) * p->level / 100) + 5);
+            new_stat = (uint16_t)floor((((base->defense + p->defense_iv) * 2 + floor(sqrt((double)p->cal_def_xp) / 4)) * p->level / 100) + 5);
             fseek(fp, p->offset_def, SEEK_SET);
             break;
         case SPEED:
-            new_stat = (uint16_t)floor(((2 * base->speed + val + floor(sqrt((double)p->cal_speed_xp) / 4)) * p->level / 100) + 5);
+            new_stat = (uint16_t)floor((((base->speed + p->speed_iv) * 2 + floor(sqrt((double)p->cal_speed_xp) / 4)) * p->level / 100) + 5);
             fseek(fp, p->offset_speed, SEEK_SET);
             break;
         case SPECIAL:
-            new_stat = (uint16_t)floor(((2 * base->special + val + floor(sqrt((double)p->cal_special_xp) / 4)) * p->level / 100) + 5);
+            new_stat = (uint16_t)floor((((base->special + p->special_iv) * 2 + floor(sqrt((double)p->cal_special_xp) / 4)) * p->level / 100) + 5);
             fseek(fp, p->offset_special, SEEK_SET);
             break;
         case HP:
-            new_stat = (uint16_t)floor(((2 * base->hp + val + floor(sqrt((double)p->cal_hp_xp) / 4)) * p->level / 100) + p->level + 10);
+            new_stat = (uint16_t)floor((((base->hp + p->hp_iv) * 2 + floor(sqrt((double)p->cal_hp_xp) / 4)) * p->level / 100) + p->level + 10);
             fseek(fp, p->offset_max_hp, SEEK_SET);
             break;
         default:

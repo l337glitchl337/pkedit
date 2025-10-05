@@ -169,28 +169,29 @@ bool edit_iv_values(FILE *fp, pokemon *p, int iv, int val, int pokemon_location)
     {
         case ATTACK_IV:
             p->attack_iv = val;
-            calc_new_stat(fp, p, ATTACK, val);
+            calc_new_stat(fp, p, ATTACK);
             break;
         case DEFENSE_IV:
             p->defense_iv = val;
-            calc_new_stat(fp, p, DEFENSE, val);
+            calc_new_stat(fp, p, DEFENSE);
             break;
         case SPEED_IV:
             p->speed_iv = val;
-            calc_new_stat(fp, p, SPEED, val);
+            calc_new_stat(fp, p, SPEED);
             break;
         case SPECIAL_IV:
             p->special_iv = val;
-            calc_new_stat(fp, p, SPECIAL, val);
+            calc_new_stat(fp, p, SPECIAL);
             break;
         case ALL_IVS:
             p->attack_iv = val;
             p->defense_iv = val;
             p->speed_iv = val;
             p->special_iv = val;
+            p->hp_iv = val;
             for(StatSelection stat = ATTACK; stat <= HP; stat++)
             {
-                calc_new_stat(fp, p, stat, val);
+                calc_new_stat(fp, p, stat);
             }
             break;
         default:
@@ -212,7 +213,7 @@ bool edit_iv_values(FILE *fp, pokemon *p, int iv, int val, int pokemon_location)
     return false;
 }
 
-bool edit_xp_values(FILE *fp, pokemon *p, int stat_select, int pokemon_location, int xp)
+bool edit_xp_values(FILE *fp, pokemon *p, int stat_select, int pokemon_location, uint16_t xp)
 {
     if(xp > 0xFFFF)
     {
@@ -223,7 +224,6 @@ bool edit_xp_values(FILE *fp, pokemon *p, int stat_select, int pokemon_location,
     uint16_t val = xp;
     uint8_t lo = val & 0xFF;
     uint8_t hi = (val >> 8) & 0xFF;
-    uint8_t packed[2];
 
     const PokemonBaseStats *base = get_base_stats(p->name);
     if(!base)
@@ -237,76 +237,48 @@ bool edit_xp_values(FILE *fp, pokemon *p, int stat_select, int pokemon_location,
         switch (stat_select)
         {
             case ATTACK_XP:
-                uint16_t new_attack = (uint16_t)floor(((2 * base->attack + p->attack_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-                packed[0] = (new_attack >> 8) & 0xFF;
-                packed[1] = new_attack & 0xFF;
+                p->cal_atk_xp = val;
+                calc_new_stat(fp, p, ATTACK);
                 p->atk_stat_exp[0] = hi;
                 p->atk_stat_exp[1] = lo;
-                fseek(fp, p->offset_atk, SEEK_SET);
-                fwrite(&packed, sizeof(packed), 1, fp);
                 fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
                 fwrite(&p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
                 break;
             case DEFENSE_XP:
-                uint16_t new_def = (uint16_t)floor(((2 * base->defense + p->defense_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-                packed[0] = (new_def >> 8) & 0xFF;
-                packed[1] = new_def & 0xFF;
+                p->cal_def_xp = val;
+                calc_new_stat(fp, p, DEFENSE);
                 p->def_stat_exp[0] = hi;
                 p->def_stat_exp[1] = lo;
-                fseek(fp, p->offset_def, SEEK_SET);
-                fwrite(&packed, sizeof(packed), 1, fp);
                 fseek(fp, p->offset_def_stat_exp, SEEK_SET);
                 fwrite(&p->def_stat_exp, sizeof(p->def_stat_exp), 1, fp);
                 break;
             case SPEED_XP:
-                uint16_t new_speed = (uint16_t)floor(((2 * base->speed + p->speed_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-                packed[0] = (new_speed >> 8) & 0xFF;
-                packed[1] = new_speed & 0xFF;
+                p->cal_speed_xp = val;
+                calc_new_stat(fp, p, SPEED);
                 p->speed_stat_exp[0] = hi;
                 p->speed_stat_exp[1] = lo;
-                fseek(fp, p->offset_speed, SEEK_SET);
-                fwrite(&packed, sizeof(packed), 1, fp);
                 fseek(fp, p->offset_speed_stat_exp, SEEK_SET);
                 fwrite(&p->speed_stat_exp, sizeof(p->speed_stat_exp), 1, fp);
                 break;
             case SPECIAL_XP:
-                uint16_t new_special = (uint16_t)floor(((2 * base->special + p->special_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + 5);
-                packed[0] = (new_special >> 8) & 0xFF;
-                packed[1] = new_special & 0xFF;
+                p->cal_special_xp = val;
+                calc_new_stat(fp, p, SPECIAL);
                 p->special_stat_exp[0] = hi;
                 p->special_stat_exp[1] = lo;
-                fseek(fp, p->offset_special, SEEK_SET);
-                fwrite(&packed, sizeof(packed), 1, fp);
                 fseek(fp, p->offset_special_stat_exp, SEEK_SET);
                 fwrite(&p->special_stat_exp, sizeof(p->special_stat_exp), 1, fp);
                 break;
             case HP_XP:
-                uint16_t new_hp = (uint16_t)floor(((2 * base->hp + p->hp_iv + floor(sqrt((double)xp) / 4)) * p->level / 100) + p->level + 10);    
-                packed[0] = (new_hp >> 8) & 0xFF;
-                packed[1] = new_hp & 0xFF;
+                p->cal_hp_xp = val;
+                calc_new_stat(fp, p, HP);
                 p->hp_stat_exp[0] = hi;
                 p->hp_stat_exp[1] = lo;
-                fseek(fp, p->offset_max_hp, SEEK_SET);
-                fwrite(&packed, sizeof(packed), 1, fp);
                 fseek(fp, p->offset_hp_stat_exp, SEEK_SET);
                 fwrite(&p->hp_stat_exp, sizeof(p->hp_stat_exp), 1, fp);
-                break;
-            case ALL_XPS:
-                //todo
                 break;
             default:
                 printf("Error: Invalid stat selection, quitting.\n");
                 exit(1);
-
-        int write1 = fwrite(&packed, sizeof(packed), 1, fp);
-        if(!write1)
-        {
-            printf("Error: Error occurred while writing to save file, quitting\n");
-            exit(1);
-        }
-
-        fseek(fp, p->offset_atk_stat_exp, SEEK_SET);
-        fwrite(&p->atk_stat_exp, sizeof(p->atk_stat_exp), 1, fp);
         }
     }
     else

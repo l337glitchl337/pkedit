@@ -4,3 +4,4 @@ main
 build/
 *.gb
 backups/
+.vscode/
