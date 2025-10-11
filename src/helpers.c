@@ -92,6 +92,14 @@ pokemon *load_pokemon(FILE *fp, PokemonLocation location, int box, int slot, uin
         }
         else
         {
+            if(cur_pos == 0 && box <= 6)
+            {
+                cur_pos = BOX_OFFSET_1_6 + ((box-1) * 0x462);
+            }
+            else if(cur_pos == 0 && box >= 7)
+            {
+                cur_pos = BOX_OFFSET_7_12 + ((box-1) * 0x462);
+            }
             fseek(fp, cur_pos, SEEK_SET);
             fread(&box_count, 1, 1, fp);
         }

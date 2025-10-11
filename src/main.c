@@ -21,15 +21,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    //pokemon *p = load_pokemon(fp, true, 0, 1, 1);
-    //edit_pokemon(fp, p, ALL_IVS, IN_PARTY, 15);
-
-    /* for(StatSelection stat = ATTACK_XP; stat <= HP_XP; stat++)
-    {
-        edit_pokemon(fp, p, stat, IN_PARTY, 65535);
-    } */
-    get_party_members(fp);
-    //show_box_pokemon(fp);
+    pokemon *p = load_pokemon(fp, IN_BOX, 2, 1, 0, 0);
+    printf("%s\n",p->name);
     return 0;
 
     /* uint16_t chk = calculate_checksum(fp);
