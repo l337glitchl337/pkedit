@@ -19,7 +19,7 @@ pokemon *load_party_pokemon(FILE *fp, uint8_t party_count)
 
     for(int i = 0; i < party_count; i++)
     {
-        pokemon *p = load_pokemon(fp, IN_PARTY, 0, i+1, party_count);
+        pokemon *p = load_pokemon(fp, IN_PARTY, 0, i+1, party_count, 0);
         party[i] = *p;
         free(p);
     }
@@ -55,7 +55,7 @@ pokemon *load_box_pokemon(FILE *fp, int n)
     exit(1);
 }
 
-pokemon *load_pokemon(FILE *fp, PokemonLocation location, int box, int slot, uint8_t party_count)
+pokemon *load_pokemon(FILE *fp, PokemonLocation location, int box, int slot, uint8_t party_count, long cur_pos)
 {
     pokemon *p = malloc(sizeof(pokemon));
     slot -= 1;
@@ -90,17 +90,12 @@ pokemon *load_pokemon(FILE *fp, PokemonLocation location, int box, int slot, uin
             fseek(fp, CURRENT_BOX_OFFSET, SEEK_SET);
             fread(&box_count, 1, 1, fp);
         }
-        else if(box <= 6)
+        else
         {
-            fseek(fp, BOX_OFFSET_1_6, SEEK_SET);
+            fseek(fp, cur_pos, SEEK_SET);
             fread(&box_count, 1, 1, fp);
         }
-        else if(box >= 7 && box <= 12)
-        {
-            fseek(fp, BOX_OFFSET_7_12, SEEK_SET);
-            fread(&box_count, 1, 1, fp);
-        }
-        offset = (box_count + (slot * 33)) - slot;
+        offset = (20 + (slot * 33)) - slot;
     }
 
     fseek(fp, slot, SEEK_CUR);

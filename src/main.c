@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
     {
         edit_pokemon(fp, p, stat, IN_PARTY, 65535);
     } */
-    //get_party_members(fp);
-    show_box_pokemon(fp);
+    get_party_members(fp);
+    //show_box_pokemon(fp);
     return 0;
 
     /* uint16_t chk = calculate_checksum(fp);

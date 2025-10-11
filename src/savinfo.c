@@ -268,9 +268,9 @@ void show_box_pokemon(FILE *fp)
 
         for(int j = 0; j < box_count; j++)
         {
-            fread(&box_pokemon, 1, 1, fp);
+            //fread(&box_pokemon, 1, 1, fp);
             //printf("└──▶ %-15s\n", species[box_pokemon]);
-            pokemon *p = load_pokemon(fp, IN_BOX, i+1, j+1, 0);
+            pokemon *p = load_pokemon(fp, IN_BOX, i+1, j+1, 0, pos);
             show_pokemon_summary(fp, p, IN_BOX);
             free(p);
         }
