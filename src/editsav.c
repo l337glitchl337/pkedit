@@ -204,7 +204,6 @@ bool edit_iv_values(FILE *fp, pokemon *p, int iv, int val, int pokemon_location)
     
     fseek(fp, p->offset_iv_data, SEEK_SET);
     int w = fwrite(&p->iv_data, sizeof(p->iv_data), 1, fp);
-    free(p);
     if(w)
     {
         calculate_checksum(fp);
@@ -275,6 +274,12 @@ bool edit_xp_values(FILE *fp, pokemon *p, int stat_select, int pokemon_location,
                 p->hp_stat_exp[1] = lo;
                 fseek(fp, p->offset_hp_stat_exp, SEEK_SET);
                 fwrite(&p->hp_stat_exp, sizeof(p->hp_stat_exp), 1, fp);
+                break;
+            case ALL_XPS:
+                for(StatSelection stat = ATTACK_XP; stat <= HP_XP; stat++)
+                {
+                    edit_xp_values(fp, p, stat, pokemon_location, xp);
+                }
                 break;
             default:
                 printf("Error: Invalid stat selection, quitting.\n");

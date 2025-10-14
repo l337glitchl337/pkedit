@@ -12,21 +12,8 @@
 #include "pkmnstructs.h"
 #include "helpers.h"
 
-void show_sav_summary(FILE *fp, int mode)
+void show_sav_summary(FILE *fp)
 {
-
-   // mode 0 is short-summary
-   // mode 1 is long summary
-
-   if(!mode)
-   {
-    get_player_name(fp);
-    get_player_id(fp);
-    get_player_money(fp);
-    get_hof_entries(fp);
-   }
-   else
-   {
     get_player_name(fp);
     get_player_id(fp);
     get_player_money(fp);
@@ -36,7 +23,6 @@ void show_sav_summary(FILE *fp, int mode)
     get_party_members(fp);
     get_bag_items(fp);
     get_pokedex_summary(fp);
-   }
 }
 
 void get_player_name(FILE *fp)
@@ -138,11 +124,13 @@ void get_bag_items(FILE *fp)
     {
         printf("%-15s [%u]\n", items[bag_items[i].item_id], bag_items[i].count);
     }
+    printf("\n");
     free(bag_items);
 }
 
 void get_party_members(FILE *fp)
 {
+    printf("Party Members\n");
     uint8_t party_count = 0;
     fseek(fp, PARTY_OFFSET, SEEK_SET);
     fread(&party_count, 1, 1, fp);
@@ -151,9 +139,6 @@ void get_party_members(FILE *fp)
 
     for(int i = 0; i < party_count; i++)
     {
-        char label[10];
-        snprintf(label, sizeof(label), "Slot: %i", i+1);
-        printf("%-20s [%s]\n\n", label, party[i].name);
         show_pokemon_summary(fp, &party[i], true);
     }
     free(party);
@@ -305,7 +290,6 @@ void show_pokemon_summary(FILE *fp, pokemon *p, PokemonLocation location)
         {
             if(strcmp(gen1_exp_groups[i].name, p->name) == 0)
             {
-                printf("%s\n", gen1_exp_groups[i].name);
                 exp_group = gen1_exp_groups[i].group;
                 break;
             }
@@ -320,6 +304,7 @@ void show_pokemon_summary(FILE *fp, pokemon *p, PokemonLocation location)
 
     }
 
+    printf("%-20s [%s]\n\n", "Name", p->name);
     printf("Stats\n");
     printf("└──▶ %-15s [%u]\n", "Current Level:", p->level);
     printf("└──▶ %-15s [%u]\n", "Current HP:", p->cal_cur_hp);
